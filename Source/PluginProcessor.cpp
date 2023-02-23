@@ -20,14 +20,43 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
+, apvts(*this, nullptr, "PARAMETERS", createParameterLayout()                       )
 #endif
 {
+    variableTree = {
+        
+        "Variables", {},
+        {
+            {"Group", {{ "name", "IR Vars"}},
+                {
+                    {"Parameter", {{"id", "file1"}, {"value", "/"}}},
+                    {"Parameter", {{"id", "root"}, {"value", "/"}}},
+                }
+            }
+        }
+    };
 }
 
 PipeDreamAudioProcessor::~PipeDreamAudioProcessor()
 {
 }
 
+juce::AudioProcessorValueTreeState::ParameterLayout
+    PipeDreamAudioProcessor::createParameterLayout()
+{
+        std::vector <std::unique_ptr<juce::RangedAudioParameter>> params;
+        
+//        auto inputGainParm = std::make_unique<juce::AudioParameterFloat>(inputGainSliderId, inputGainSliderName, -24.0f, 24.0f, 0.0f);
+//
+//        params.push_back(std::move(inputGainParm));
+        
+        return {params.begin(), params.end() };
+}
+
+void PipeDreamAudioProcessor::parameterChanged(const juce::String &parameterID, float newValue)
+{
+    
+}
 //==============================================================================
 const juce::String PipeDreamAudioProcessor::getName() const
 {
@@ -93,8 +122,16 @@ void PipeDreamAudioProcessor::changeProgramName (int index, const juce::String& 
 //==============================================================================
 void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.sampleRate = sampleRate;
+    spec.numChannels = getTotalNumOutputChannels();
+    
+    irLoader.reset();
+    irLoader.prepare(spec);
+    
+    if (savedFile.existsAsFile()) {
+        irLoader.loadImpulseResponse(savedFile, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0);
+    }
 }
 
 void PipeDreamAudioProcessor::releaseResources()
@@ -135,27 +172,32 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    juce::dsp::AudioBlock<float> block {buffer};
+    if (irLoader.getCurrentIRSize() > 0)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
+        irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
     }
+//    // In case we have more outputs than inputs, this code clears any output
+//    // channels that didn't contain input data, (because these aren't
+//    // guaranteed to be empty - they may contain garbage).
+//    // This is here to avoid people getting screaming feedback
+//    // when they first compile a plugin, but obviously you don't need to keep
+//    // this code if your algorithm always overwrites all the output channels.
+//    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+//        buffer.clear (i, 0, buffer.getNumSamples());
+//
+//    // This is the place where you'd normally do the guts of your plugin's
+//    // audio processing...
+//    // Make sure to reset the state if your inner loop is processing
+//    // the samples and the outer loop is handling the channels.
+//    // Alternatively, you can process the samples with the channels
+//    // interleaved by keeping the same state.
+//    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+//    {
+//        auto* channelData = buffer.getWritePointer (channel);
+//
+//        // ..do something to the data...
+//    }
 }
 
 //==============================================================================
@@ -172,15 +214,24 @@ juce::AudioProcessorEditor* PipeDreamAudioProcessor::createEditor()
 //==============================================================================
 void PipeDreamAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    apvts.state.appendChild(variableTree, nullptr);
+    juce::MemoryOutputStream stream(destData, false);
+    apvts.state.writeToStream (stream);
 }
 
 void PipeDreamAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    auto tree = juce::ValueTree::readFromData(data, size_t(sizeInBytes));
+    variableTree = tree.getChildWithName("variables");
+    
+    if (tree.isValid())
+    {
+        apvts.state = tree;
+        
+        savedFile = variableTree.getProperty("file1");
+        root = variableTree.getProperty("root");
+        
+    }
 }
 
 //==============================================================================

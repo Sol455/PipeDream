@@ -13,10 +13,7 @@
 //==============================================================================
 /**
 */
-class PipeDreamAudioProcessor  : public juce::AudioProcessor
-                            #if JucePlugin_Enable_ARA
-                             , public juce::AudioProcessorARAExtension
-                            #endif
+class PipeDreamAudioProcessor  : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     //==============================================================================
@@ -55,8 +52,17 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    juce::AudioProcessorValueTreeState apvts;
+    juce::ValueTree variableTree;
+    
+    juce::File root, savedFile;
+    juce::dsp::Convolution irLoader;
 
 private:
     //==============================================================================
+    juce::dsp::ProcessSpec spec;
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    void parameterChanged (const juce::String& arameterID, float newValue) override;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PipeDreamAudioProcessor)
 };
