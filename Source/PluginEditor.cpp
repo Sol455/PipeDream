@@ -33,8 +33,8 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
             {
                 audioProcessor.savedFile = result;
                 audioProcessor.root = result.getParentDirectory().getFullPathName();
-                audioProcessor.variableTree.setProperty("file1", result.getFullPathName(), nullptr);
-                audioProcessor.variableTree.setProperty("root", result.getParentDirectory().getFullPathName(), nullptr);
+//                audioProcessor.variableTree.setProperty("file1", result.getFullPathName(), nullptr);
+//                audioProcessor.variableTree.setProperty("root", result.getParentDirectory().getFullPathName(), nullptr);
                 audioProcessor.irLoader.reset();
                 audioProcessor.irLoader.loadImpulseResponse(audioProcessor.savedFile,
                                                             juce::dsp::Convolution::Stereo::yes,

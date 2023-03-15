@@ -231,6 +231,8 @@ void PipeDreamAudioProcessor::setStateInformation (const void* data, int sizeInB
         savedFile = variableTree.getProperty("file1");
         root = variableTree.getProperty("root");
         
+        //irLoader.loadImpulseResponse(savedFile, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0);
+        
     }
 }
 

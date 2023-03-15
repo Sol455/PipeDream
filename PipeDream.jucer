@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="Ka37Me" name="PipeDream" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Sol"
-              companyWebsite="www.solharter.com">
+              companyWebsite="www.solharter.com" cppLanguageStandard="17">
   <MAINGROUP id="DJ8px5" name="PipeDream">
     <GROUP id="{DA2250E7-A89F-7E78-0C56-356084F7AAB0}" name="Source">
       <FILE id="cE5rE3" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -54,4 +54,7 @@
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
+  <LIVE_SETTINGS>
+    <OSX/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>
