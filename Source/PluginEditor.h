@@ -28,10 +28,15 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     PipeDreamAudioProcessor& audioProcessor;
+    juce::ValueTree& variableTree;
+    
     
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;
     juce::Label irName;
+    
+//    juce::Identifier FilePath1;
+//    juce::Identifier Root;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PipeDreamAudioProcessorEditor)
 };

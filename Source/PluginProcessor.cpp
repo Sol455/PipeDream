@@ -23,18 +23,7 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
 , apvts(*this, nullptr, "PARAMETERS", createParameterLayout()                       )
 #endif
 {
-    variableTree = {
-        
-        "Variables", {},
-        {
-            {"Group", {{ "name", "IR Vars"}},
-                {
-                    {"Parameter", {{"id", "file1"}, {"value", "/"}}},
-                    {"Parameter", {{"id", "root"}, {"value", "/"}}},
-                }
-            }
-        }
-    };
+
 }
 
 PipeDreamAudioProcessor::~PipeDreamAudioProcessor()
@@ -122,6 +111,7 @@ void PipeDreamAudioProcessor::changeProgramName (int index, const juce::String& 
 //==============================================================================
 void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
@@ -129,8 +119,12 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     irLoader.reset();
     irLoader.prepare(spec);
     
-    if (savedFile.existsAsFile()) {
-        irLoader.loadImpulseResponse(savedFile, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0);
+    currentIR = FilePath + "/PIPE_A2.wav";
+    
+    
+    if (currentIR.existsAsFile()) {
+        DBG("file Exists");
+        irLoader.loadImpulseResponse(currentIR, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0);
     }
 }
 

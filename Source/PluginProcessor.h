@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "paths.h"
 
 //==============================================================================
 /**
@@ -54,15 +55,32 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
     
     juce::AudioProcessorValueTreeState apvts;
-    juce::ValueTree variableTree;
+
     
-    juce::File root, savedFile;
+    juce::ValueTree& getVariableTree(){ return variableTree; };
+    
+    
+    juce::File root, savedFile, currentIR;
     juce::dsp::Convolution irLoader;
 
+    
+    
+    static juce::String getPathtoIRFolder()
+    {
+        if((juce::SystemStats::getOperatingSystemType() & juce::SystemStats::MacOSX) != 0)
+        {
+            return juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonApplicationDataDirectory).getFullPathName() + "/Application Support/PipeDream/IRs";
+        }
+        return "";
+    }
+    
+    juce::String FilePath = getPathtoIRFolder();
+    
 private:
     //==============================================================================
     juce::dsp::ProcessSpec spec;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    juce::ValueTree variableTree {"variableTree"};
     void parameterChanged (const juce::String& arameterID, float newValue) override;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PipeDreamAudioProcessor)
 };

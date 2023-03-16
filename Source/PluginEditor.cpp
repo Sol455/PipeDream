@@ -11,13 +11,13 @@
 
 //==============================================================================
 PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), variableTree(p.getVariableTree())
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     addAndMakeVisible(loadBtn);
     loadBtn.setButtonText("Load IR");
-
+    DBG("variable tree in editor = " << static_cast<int>(variableTree.isValid()));
     loadBtn.onClick = [this]()
     {
         fileChooser = std::make_unique<juce::FileChooser>("Choose File",
@@ -33,14 +33,16 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
             {
                 audioProcessor.savedFile = result;
                 audioProcessor.root = result.getParentDirectory().getFullPathName();
-//                audioProcessor.variableTree.setProperty("file1", result.getFullPathName(), nullptr);
-//                audioProcessor.variableTree.setProperty("root", result.getParentDirectory().getFullPathName(), nullptr);
-                audioProcessor.irLoader.reset();
-                audioProcessor.irLoader.loadImpulseResponse(audioProcessor.savedFile,
-                                                            juce::dsp::Convolution::Stereo::yes,
-                                                            juce::dsp::Convolution::Trim::yes,
-                                                            0);
+                //variableTree.setProperty("FilePath1", audioProcessor.savedFile.getFullPathName(), nullptr);
                 
+                //variableTree.setProperty("FilePath2", "WAG1", nullptr);
+                //audioProcessor.variableTree.setProperty("Root", audioProcessor.savedFile.getParentDirectory().getFullPathName(), nullptr);
+                audioProcessor.irLoader.reset();
+//                audioProcessor.irLoader.loadImpulseResponse(audioProcessor.savedFile,
+//                                                            juce::dsp::Convolution::Stereo::yes,
+//                                                            juce::dsp::Convolution::Trim::yes,
+//                                                            0);
+//                
                 irName.setText(result.getFileName(), juce::dontSendNotification);
             }
         });
