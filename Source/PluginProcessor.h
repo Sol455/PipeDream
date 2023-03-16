@@ -54,6 +54,8 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    //===================================
+    void readIRFromFile(int IRNum);
     
     juce::AudioProcessorValueTreeState apvts;
 
@@ -73,7 +75,7 @@ public:
     {
         if((juce::SystemStats::getOperatingSystemType() & juce::SystemStats::MacOSX) != 0)
         {
-            return juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonApplicationDataDirectory).getFullPathName() + "/Application Support/PipeDream/IRs";
+            return juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonApplicationDataDirectory).getFullPathName() + "/Application Support/PipeDream/IRs/";
         }
         return "";
     }
@@ -81,6 +83,8 @@ public:
     juce::String FilePath = getPathtoIRFolder();
     
     BufferTransfer bufferTransfer;
+    
+    juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
 
     
 private:

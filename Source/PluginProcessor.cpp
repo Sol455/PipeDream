@@ -116,7 +116,20 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
     
-    currentIR = FilePath + "/DRAIN.wav";
+    readIRFromFile(2);
+    
+    
+    irLoader.reset();
+    irLoader.prepare(spec);
+    
+
+    
+    
+}
+    
+void PipeDreamAudioProcessor::readIRFromFile(int IRNum) {
+    
+    currentIR = FilePath + IRNames[IRNum];
     
     if(currentIR.existsAsFile())
     {
@@ -137,41 +150,13 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 
         float RMS =buffer.getRMSLevel(0, 0, (int)reader->lengthInSamples);
         DBG("RMS= " << RMS);
+        
+        //juce::ResamplingAudioSource(&buffer, 0);
+        
+        
         bufferTransfer.set (BufferWithSampleRate { std::move (buffer), reader->sampleRate });
     }
-    
-    
-    irLoader.reset();
-    irLoader.prepare(spec);
-    
-    
-    //if ((currentIR.existsAsFile()) & (RMS > 0)) {
-    //  DBG("file Exists");
-    //irLoader.loadImpulseResponse(&currentIR, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Stereo::yes, 0);
-    //        irLoader.loadImpulseResponse(std::move (fileBuffer),
-    //                                     spec.sampleRate,
-    //                                     juce::dsp::Convolution::Stereo::yes,
-    //                                     juce::dsp::Convolution::Stereo::yes,
-    //                                     0);
-    
-    //DBG("FIle Buffer valid" << static_cast<int>(fileBuffer.isValid()));
-    
-    //
-    //        irLoader.loadImpulseResponse (std::move (&fileBuffer),
-    //                                      reader->sampleRate,
-    //                                  juce::dsp::Convolution::Stereo::yes,
-    //                                  juce::dsp::Convolution::Trim::no,
-    //                                  0,
-    //                                  juce::dsp::Convolution::Normalise::no);
-    
-    //
-    //    } else {
-    //        DBG("file Doesnt Exist");
-    //    }
-    
-    
 }
-    
 
 
 void PipeDreamAudioProcessor::releaseResources()
