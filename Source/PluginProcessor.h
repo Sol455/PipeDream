@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "paths.h"
+#include "BufferTran.h"
 
 //==============================================================================
 /**
@@ -62,6 +63,9 @@ public:
     
     juce::File root, savedFile, currentIR;
     juce::dsp::Convolution irLoader;
+    
+    juce::AudioSampleBuffer fileBuffer;
+
 
     
     
@@ -75,6 +79,9 @@ public:
     }
     
     juce::String FilePath = getPathtoIRFolder();
+    
+    BufferTransfer bufferTransfer;
+
     
 private:
     //==============================================================================

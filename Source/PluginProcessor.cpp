@@ -111,22 +111,68 @@ void PipeDreamAudioProcessor::changeProgramName (int index, const juce::String& 
 //==============================================================================
 void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-
+    
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
     
+    currentIR = FilePath + "/DRAIN.wav";
+    
+    if(currentIR.existsAsFile())
+    {
+        
+        juce::AudioFormatManager manager;
+        manager.registerBasicFormats();
+        std::unique_ptr<juce::AudioFormatReader> reader { manager.createReaderFor (std::move (currentIR)) };
+
+        if (reader == nullptr)
+        {
+            jassertfalse;
+            return;
+        }
+
+        juce::AudioBuffer<float> buffer (static_cast<int> (reader->numChannels),
+                                   static_cast<int> (reader->lengthInSamples));
+        reader->read (buffer.getArrayOfWritePointers(), buffer.getNumChannels(), 0, buffer.getNumSamples());
+
+        float RMS =buffer.getRMSLevel(0, 0, (int)reader->lengthInSamples);
+        DBG("RMS= " << RMS);
+        bufferTransfer.set (BufferWithSampleRate { std::move (buffer), reader->sampleRate });
+    }
+    
+    
     irLoader.reset();
     irLoader.prepare(spec);
     
-    currentIR = FilePath + "/PIPE_A2.wav";
+    
+    //if ((currentIR.existsAsFile()) & (RMS > 0)) {
+    //  DBG("file Exists");
+    //irLoader.loadImpulseResponse(&currentIR, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Stereo::yes, 0);
+    //        irLoader.loadImpulseResponse(std::move (fileBuffer),
+    //                                     spec.sampleRate,
+    //                                     juce::dsp::Convolution::Stereo::yes,
+    //                                     juce::dsp::Convolution::Stereo::yes,
+    //                                     0);
+    
+    //DBG("FIle Buffer valid" << static_cast<int>(fileBuffer.isValid()));
+    
+    //
+    //        irLoader.loadImpulseResponse (std::move (&fileBuffer),
+    //                                      reader->sampleRate,
+    //                                  juce::dsp::Convolution::Stereo::yes,
+    //                                  juce::dsp::Convolution::Trim::no,
+    //                                  0,
+    //                                  juce::dsp::Convolution::Normalise::no);
+    
+    //
+    //    } else {
+    //        DBG("file Doesnt Exist");
+    //    }
     
     
-    if (currentIR.existsAsFile()) {
-        DBG("file Exists");
-        irLoader.loadImpulseResponse(currentIR, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0);
-    }
 }
+    
+
 
 void PipeDreamAudioProcessor::releaseResources()
 {
@@ -167,10 +213,24 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
     juce::dsp::AudioBlock<float> block {buffer};
-    if (irLoader.getCurrentIRSize() > 0)
+    
+    bufferTransfer.get ([this] (BufferWithSampleRate& buf)
     {
-        irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
-    }
+        irLoader.loadImpulseResponse (std::move (buf.buffer),
+                                         buf.sampleRate,
+                                         juce::dsp::Convolution::Stereo::yes,
+                                         juce::dsp::Convolution::Trim::yes,
+                                         juce::dsp::Convolution::Normalise::yes);
+    });
+    
+    irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
+
+    
+    
+//    if (irLoader.getCurrentIRSize() > 0)
+//    {
+//        irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
+//    }
 //    // In case we have more outputs than inputs, this code clears any output
 //    // channels that didn't contain input data, (because these aren't
 //    // guaranteed to be empty - they may contain garbage).
