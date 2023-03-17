@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "paths.h"
 #include "BufferTran.h"
+#include "Buffers.h"
 
 //==============================================================================
 /**
@@ -56,6 +57,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
     //===================================
     void readIRFromFile(int IRNum);
+    void rePitchBuffer(int test);
     
     juce::AudioProcessorValueTreeState apvts;
 
@@ -83,6 +85,7 @@ public:
     juce::String FilePath = getPathtoIRFolder();
     
     BufferTransfer bufferTransfer;
+    BufferStore bufferStore;
     
     juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
 

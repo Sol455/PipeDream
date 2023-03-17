@@ -117,13 +117,8 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.numChannels = getTotalNumOutputChannels();
     
     readIRFromFile(2);
-    
-    
     irLoader.reset();
     irLoader.prepare(spec);
-    
-
-    
     
 }
     
@@ -144,20 +139,47 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum) {
             return;
         }
 
-        juce::AudioBuffer<float> buffer (static_cast<int> (reader->numChannels),
-                                   static_cast<int> (reader->lengthInSamples));
-        reader->read (buffer.getArrayOfWritePointers(), buffer.getNumChannels(), 0, buffer.getNumSamples());
+        //juce::AudioBuffer<float> buffer (static_cast<int> (reader->numChannels),
+         //                          static_cast<int> (reader->lengthInSamples));
+        
+        //reader->read (buffer.getArrayOfWritePointers(), buffer.getNumChannels(), 0, buffer.getNumSamples());
+        
+        bufferStore.SetInfo(static_cast<int> (reader->numChannels), static_cast<int>(reader->lengthInSamples));
+        
+        reader->read (bufferStore.BufBankWriteP(2), bufferStore.getChannels(2), 0, bufferStore.getSamples(2));
 
-        float RMS =buffer.getRMSLevel(0, 0, (int)reader->lengthInSamples);
-        DBG("RMS= " << RMS);
-        
-        //juce::ResamplingAudioSource(&buffer, 0);
-        
-        
-        bufferTransfer.set (BufferWithSampleRate { std::move (buffer), reader->sampleRate });
+//        float RMS =buffer.getRMSLevel(0, 0, (int)reader->lengthInSamples);
+//        DBG("RMS= " << RMS);
+//
+//
+        bufferTransfer.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(2)), reader->sampleRate });
     }
 }
 
+//void PipeDreamAudioProcessor::rePitchBuffer(int IRNum) {
+//    juce::AudioSampleBuffer temp;
+//
+//    sofar = 0;
+//    waveBuffer.clear();
+//    temp.clear();
+//
+//    double ratio =  reader->sampleRate / hostSampleRate;
+//
+//    temp.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
+//    waveBuffer.setSize((int)reader->numChannels, (int)(((double)reader->lengthInSamples) / ratio));
+//
+//    reader->read(&temp, 0, (int)reader->lengthInSamples, 0, true, true);
+//
+//    ScopedPointer<LagrangeInterpolator> resampler = new LagrangeInterpolator();
+//
+//    const float **inputs  = temp.getArrayOfReadPointers();
+//    float **outputs = waveBuffer.getArrayOfWritePointers();
+//    for (int c = 0; c < waveBuffer.getNumChannels(); c++)
+//    {
+//        resampler->reset();
+//        resampler->process(ratio, inputs[c], outputs[c], waveBuffer.getNumSamples());
+//    }
+//}
 
 void PipeDreamAudioProcessor::releaseResources()
 {
