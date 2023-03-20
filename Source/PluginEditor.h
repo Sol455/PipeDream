@@ -30,6 +30,10 @@ private:
     PipeDreamAudioProcessor& audioProcessor;
     juce::ValueTree& variableTree;
     
+    juce::Slider PitchSel1Slider;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel1Attachment;
+    
     
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;

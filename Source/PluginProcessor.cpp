@@ -34,6 +34,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     PipeDreamAudioProcessor::createParameterLayout()
 {
         std::vector <std::unique_ptr<juce::RangedAudioParameter>> params;
+    
+ 
+        
+        params.push_back (std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ "PITCHSEL1", 1}, "pitchSel1", -12, 12, 0));
         
 //        auto inputGainParm = std::make_unique<juce::AudioParameterFloat>(inputGainSliderId, inputGainSliderName, -24.0f, 24.0f, 0.0f);
 //
@@ -215,6 +219,10 @@ bool PipeDreamAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    
+    auto g = apvts.getRawParameterValue("PITCHSEL1");
+    std::cout << g->load() <<std::endl;
+    
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();

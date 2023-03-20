@@ -51,6 +51,12 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     
     addAndMakeVisible(irName);
     
+    PitchSel1Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    PitchSel1Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 50);
+    addAndMakeVisible(PitchSel1Slider);
+    
+    PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "PITCHSEL1", PitchSel1Slider);
+    
     setSize (400, 300);
 }
 
@@ -81,4 +87,6 @@ void PipeDreamAudioProcessorEditor::resized()
     
     loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
     irName.setBounds(loadBtn.getX() + loadBtn.getWidth(), btnY, btnWidth * 2, btnHeight);
+    
+    PitchSel1Slider.setBounds (getWidth() / 2 - 100, getHeight() /2 - 50 , 200, 100);
 }

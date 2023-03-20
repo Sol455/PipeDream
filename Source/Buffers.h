@@ -17,7 +17,6 @@
 class BufferStore
 {
 public:
-    //const float *const* BufBankWriteP (int bufID)
     auto BufBankWriteP (int bufID)
     {
         return bufferBank1[bufID].getArrayOfWritePointers();
@@ -80,12 +79,7 @@ private:
     };
 
     
-    
-//    BufferWithSampleRate buffer;
-//    bool newBuffer = false;
-//    juce::SpinLock mutex;
-    
-    //juce
+
 };
 
 #endif

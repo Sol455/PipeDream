@@ -56,7 +56,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     //===================================
-    void readIRFromFile(int IRNum);
+    void readIRFromFile(int IRNum, int bufferToLocate) {
     void rePitchBuffer(int test);
     
     juce::AudioProcessorValueTreeState apvts;
@@ -69,8 +69,6 @@ public:
     juce::dsp::Convolution irLoader;
     
     juce::AudioSampleBuffer fileBuffer;
-
-
     
     
     static juce::String getPathtoIRFolder()
