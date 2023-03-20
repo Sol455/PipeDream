@@ -12,6 +12,7 @@
 #include "paths.h"
 #include "BufferTran.h"
 #include "Buffers.h"
+#include "Params.h"
 
 //==============================================================================
 /**
@@ -56,8 +57,10 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     //===================================
-    void readIRFromFile(int IRNum);
-    void rePitchBuffer(int test);
+    void readIRFromFile(int IRNum, int IRtoWrite);
+    //void rePitchBuffer(int test);
+    //void repitchBuffer(juce::AudioFormatReader* reader, int bufferNum);
+    void repitchBuffer(std::unique_ptr<juce::AudioFormatReader> reader, int bufferNum, const double& dOutSampleRate);
     
     juce::AudioProcessorValueTreeState apvts;
 
@@ -92,6 +95,14 @@ public:
     
 private:
     //==============================================================================
+    
+    juce::AudioParameterInt* pitchsel1 {nullptr};
+    juce::AudioParameterFloat* pitchsel2 {nullptr};
+    juce::AudioParameterFloat* pitchsel3 {nullptr};
+    juce::AudioParameterFloat* pitchsel4 {nullptr};
+    juce::AudioParameterFloat* pitchsel5 {nullptr};
+    //juce::AudioParameterFloat* midHighCrossover {nullptr};
+    
     juce::dsp::ProcessSpec spec;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::ValueTree variableTree {"variableTree"};

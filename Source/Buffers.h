@@ -14,78 +14,82 @@
 
 #pragma once
 
+
+
 class BufferStore
 {
 public:
     //const float *const* BufBankWriteP (int bufID)
     auto BufBankWriteP (int bufID)
     {
-        return bufferBank1[bufID].getArrayOfWritePointers();
+        return bufferBank1[bufID].buffer.getArrayOfWritePointers();
     }
     
-    void SetInfo (int numberofChannels, int numberofSamples)
+    auto BufBankarrayReadP (int bufID)
+    {
+        return bufferBank1[bufID].buffer.getArrayOfReadPointers();
+    }
+    
+    void SetBufferSize (int buffernum, int numberofChannels, int numberofSamples)
+    {
+        //for(int i = 0; i < 12; i++ ) {
+            bufferBank1[buffernum].buffer.setSize(numberofChannels, numberofSamples, true, false, false);
+            //return bufferBank1[bufID];
+       // }
+    }
+    
+    void SetInfoAll (int numberofChannels, int numberofSamples)
     {
         for(int i = 0; i < 12; i++ ) {
-            bufferBank1[i].setSize(numberofChannels, numberofSamples, true, false, false);
+            bufferBank1[i].buffer.setSize(numberofChannels, numberofSamples, true, false, false);
             //return bufferBank1[bufID];
         }
     }
-
+    
+    void SetSampleRate (int bufID, double sampleRate)
+    {
+        bufferBank1[bufID].sampleRate = sampleRate;
+    }
+    
+    double GetSampleRate (int bufID)
+    {
+        return bufferBank1[bufID].sampleRate;
+    }
     
     auto BufBankReadP (int bufID)
     {
-        return bufferBank1[bufID];
+        return bufferBank1[bufID].buffer;
     }
     
     int getSamples (int bufID)
     {
-        return bufferBank1[bufID].getNumSamples();
+        return bufferBank1[bufID].buffer.getNumSamples();
     }
     
     int getChannels (int bufID)
     {
-        return bufferBank1[bufID].getNumChannels();
+        return bufferBank1[bufID].buffer.getNumChannels();
     }
 
-    
-    //juce::AudioBuffer::getArrayOfReadPointers
+
 private:
     
-    juce::AudioBuffer<float> bufa1;
-    juce::AudioBuffer<float> bufa2;
-    juce::AudioBuffer<float> bufa3;
-    juce::AudioBuffer<float> bufa4;
-    juce::AudioBuffer<float> bufa5;
-    juce::AudioBuffer<float> bufa6;
-    juce::AudioBuffer<float> bufa7;
-    juce::AudioBuffer<float> bufa8;
-    juce::AudioBuffer<float> bufa9;
-    juce::AudioBuffer<float> bufa10;
-    juce::AudioBuffer<float> bufa11;
-    juce::AudioBuffer<float> bufa12;
+//    juce::AudioBuffer<float> bufa1;
+//    juce::AudioBuffer<float> bufa2;
+//    juce::AudioBuffer<float> bufa3;
+//    juce::AudioBuffer<float> bufa4;
+//    juce::AudioBuffer<float> bufa5;
+//    juce::AudioBuffer<float> bufa6;
+//    juce::AudioBuffer<float> bufa7;
+//    juce::AudioBuffer<float> bufa8;
+//    juce::AudioBuffer<float> bufa9;
+//    juce::AudioBuffer<float> bufa10;
+//    juce::AudioBuffer<float> bufa11;
+//    juce::AudioBuffer<float> bufa12;
     
-    juce::AudioBuffer<float> bufferBank1[12] = {
-        bufa1,
-        bufa2,
-        bufa3,
-        bufa4,
-        bufa5,
-        bufa6,
-        bufa7,
-        bufa8,
-        bufa9,
-        bufa10,
-        bufa11,
-        bufa12,
+    BufferWithSampleRate bufferBank1[12] = {
     };
 
-    
-    
-//    BufferWithSampleRate buffer;
-//    bool newBuffer = false;
-//    juce::SpinLock mutex;
-    
-    //juce
 };
 
 #endif

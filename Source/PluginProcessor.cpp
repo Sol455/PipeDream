@@ -23,6 +23,39 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
 , apvts(*this, nullptr, "PARAMETERS", createParameterLayout()                       )
 #endif
 {
+    
+    //Retrieve APVTS stored paramaters and assign them to cached pointers    //Assert that parameter names are spelt correctly
+        
+        using namespace Params;
+        const auto& params = GetParams();
+        
+        auto IntHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
+        {
+            param = dynamic_cast<juce::AudioParameterInt*>(apvts.getParameter(params.at(paramName)));
+            jassert(param !=nullptr);
+        };
+    
+    IntHelper(pitchsel1, Names::Pitch_Sel_1);
+    
+    
+    
+    //juce::AudioParameterInt
+        
+    
+//    auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
+//    {
+//        param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
+//        jassert(param !=nullptr);
+//    };
+    
+    
+        //IntHelper(pitchsel1, Names::Pitch_Sel_1);
+    
+        //lowMidCrossover->get();
+        //floatHelper(lowBandComp.release, Names::Release_Low_Band);
+        //floatHelper(lowBandComp.threshold, Names::Threshold_Low_Band);
+    
+        
 
 }
 
@@ -33,13 +66,42 @@ PipeDreamAudioProcessor::~PipeDreamAudioProcessor()
 juce::AudioProcessorValueTreeState::ParameterLayout
     PipeDreamAudioProcessor::createParameterLayout()
 {
-        std::vector <std::unique_ptr<juce::RangedAudioParameter>> params;
+        //std::vector <std::unique_ptr<juce::RangedAudioParameter>> params;
         
 //        auto inputGainParm = std::make_unique<juce::AudioParameterFloat>(inputGainSliderId, inputGainSliderName, -24.0f, 24.0f, 0.0f);
+          //params.push_back (std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ "Pitch Select 1", 1}, "Pitch_Select_1", -12, 12, 0));
+
 //
 //        params.push_back(std::move(inputGainParm));
         
-        return {params.begin(), params.end() };
+        //return {params.begin(), params.end() };
+        
+        
+        juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+        using namespace juce;
+        using namespace Params;
+        const auto& params = GetParams();
+        
+        //auto gainRange = NormalisableRange<float>(-24.f, 24.f, 0.5, 1);
+        
+        //auto pitchRange = NormalisableRange<float>(-24, 24, 1, 1);
+        
+//        layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{params.at(Names::Pitch_Sel_1),1},
+//                                                                                params.at(Names::Pitch_Sel_1),
+//                                                                                pitchRange,
+//                                                                                0));
+        
+        
+        layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_1),1},
+                                                            params.at(Names::Pitch_Sel_1),
+                                                            -24,
+                                                            24,
+                                                             0));
+        
+        //<juce::AudioParameterFloat(<#const ParameterID &parameterID#>, <#const String &parameterName#>, <#NormalisableRange<float> normalisableRange#>, <#float defaultValue#>)
+        
+        return layout;
 }
 
 void PipeDreamAudioProcessor::parameterChanged(const juce::String &parameterID, float newValue)
@@ -116,13 +178,20 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
     
-    readIRFromFile(2);
+    readIRFromFile(0, 0);
+    readIRFromFile(1, 1);
+    readIRFromFile(2, 2);
     irLoader.reset();
     irLoader.prepare(spec);
     
+    //auto g = apvts.getRawParameterValue("PITCHSEL1");
+    
+    //apvts.getRawParameterValue(<#StringRef parameterID#>)
+    
+    
 }
     
-void PipeDreamAudioProcessor::readIRFromFile(int IRNum) {
+void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int IRtoWrite) {
     
     currentIR = FilePath + IRNames[IRNum];
     
@@ -139,47 +208,52 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum) {
             return;
         }
 
-        //juce::AudioBuffer<float> buffer (static_cast<int> (reader->numChannels),
-         //                          static_cast<int> (reader->lengthInSamples));
         
-        //reader->read (buffer.getArrayOfWritePointers(), buffer.getNumChannels(), 0, buffer.getNumSamples());
+        bufferStore.SetInfoAll(static_cast<int> (reader->numChannels), static_cast<int>(reader->lengthInSamples));
         
-        bufferStore.SetInfo(static_cast<int> (reader->numChannels), static_cast<int>(reader->lengthInSamples));
+        //repitchBuffer(reader, 0, 44000);
+        reader->read (bufferStore.BufBankWriteP(IRtoWrite), bufferStore.getChannels(IRtoWrite), 0, bufferStore.getSamples(IRtoWrite));
         
-        reader->read (bufferStore.BufBankWriteP(2), bufferStore.getChannels(2), 0, bufferStore.getSamples(2));
-
-//        float RMS =buffer.getRMSLevel(0, 0, (int)reader->lengthInSamples);
-//        DBG("RMS= " << RMS);
-//
-//
-        bufferTransfer.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(2)), reader->sampleRate });
+        
+        bufferStore.SetSampleRate(IRtoWrite, reader->sampleRate);
     }
 }
 
-//void PipeDreamAudioProcessor::rePitchBuffer(int IRNum) {
-//    juce::AudioSampleBuffer temp;
-//
-//    sofar = 0;
-//    waveBuffer.clear();
-//    temp.clear();
-//
-//    double ratio =  reader->sampleRate / hostSampleRate;
-//
-//    temp.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
-//    waveBuffer.setSize((int)reader->numChannels, (int)(((double)reader->lengthInSamples) / ratio));
-//
-//    reader->read(&temp, 0, (int)reader->lengthInSamples, 0, true, true);
-//
-//    ScopedPointer<LagrangeInterpolator> resampler = new LagrangeInterpolator();
-//
-//    const float **inputs  = temp.getArrayOfReadPointers();
-//    float **outputs = waveBuffer.getArrayOfWritePointers();
-//    for (int c = 0; c < waveBuffer.getNumChannels(); c++)
-//    {
-//        resampler->reset();
-//        resampler->process(ratio, inputs[c], outputs[c], waveBuffer.getNumSamples());
-//    }
-//}
+void PipeDreamAudioProcessor::repitchBuffer(std::unique_ptr<juce::AudioFormatReader> reader, int bufferNum, const double& dOutSampleRate) {
+    
+        juce::AudioSampleBuffer temp;
+    
+        //sofar = 0;
+    
+        //clear buffers
+        bufferStore.BufBankReadP(bufferNum).clear();
+        //waveBuffer.clear();
+        temp.clear();
+    
+        double ratio =  reader->sampleRate / dOutSampleRate;
+    
+        temp.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
+    
+        //next to do
+        bufferStore.SetBufferSize(bufferNum, static_cast<int> (reader->numChannels), ((static_cast<int>(reader->lengthInSamples))/ ratio));
+        
+    
+    //waveBuffer.setSize((int)reader->numChannels, (int)(((double)reader->lengthInSamples) / ratio));
+    
+        reader->read(&temp, 0, (int)reader->lengthInSamples, 0, true, true);
+    
+        juce::ScopedPointer<juce::LagrangeInterpolator> resampler = new juce::LagrangeInterpolator();
+    
+        const float *const * inputs  = bufferStore.BufBankarrayReadP(bufferNum); //temp.getArrayOfReadPointers();
+        float *const*  outputs = bufferStore.BufBankWriteP(bufferNum);
+        //float **outputs = waveBuffer.getArrayOfWritePointers();
+        for (int c = 0; c < bufferStore.getChannels(bufferNum); c++)
+        {
+            resampler->reset();
+            resampler->process(ratio, inputs[c], outputs[c], bufferStore.getSamples(bufferNum)); //.getNumSamples());
+        }
+    
+}
 
 void PipeDreamAudioProcessor::releaseResources()
 {
@@ -216,8 +290,17 @@ bool PipeDreamAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
+    
+    //auto g = apvts.getRawParameterValue("PITCHSEL1");
+    //std::cout << g->load() <<std::endl;
+    
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    auto pitches1 = pitchsel1->get();
+    
+    bufferTransfer.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches1)),
+                                                bufferStore.GetSampleRate(pitches1)});
 
     juce::dsp::AudioBlock<float> block {buffer};
     
