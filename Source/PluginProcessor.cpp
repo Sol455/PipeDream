@@ -177,9 +177,9 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
-    
-    readIRFromFile(0, 0);
-    readIRFromFile(1, 1);
+    //0,1 2
+    readIRFromFile(2, 0);
+    readIRFromFile(2, 1);
     readIRFromFile(2, 2);
     irLoader.reset();
     irLoader.prepare(spec);
@@ -200,26 +200,26 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int IRtoWrite) {
         
         juce::AudioFormatManager manager;
         manager.registerBasicFormats();
-        std::unique_ptr<juce::AudioFormatReader> reader { manager.createReaderFor (std::move (currentIR)) };
+        juce::AudioFormatReader *reader { manager.createReaderFor (std::move (currentIR)) };
 
-        if (reader == nullptr)
-        {
-            jassertfalse;
-            return;
-        }
+//        if (reader == nullptr)
+//        {
+//            jassertfalse;
+//            return;
+//        }
 
         
         bufferStore.SetInfoAll(static_cast<int> (reader->numChannels), static_cast<int>(reader->lengthInSamples));
         
-        //repitchBuffer(reader, 0, 44000);
+        repitchBuffer(reader, 0, 44000);
         reader->read (bufferStore.BufBankWriteP(IRtoWrite), bufferStore.getChannels(IRtoWrite), 0, bufferStore.getSamples(IRtoWrite));
         
         
         bufferStore.SetSampleRate(IRtoWrite, reader->sampleRate);
     }
 }
-
-void PipeDreamAudioProcessor::repitchBuffer(std::unique_ptr<juce::AudioFormatReader> reader, int bufferNum, const double& dOutSampleRate) {
+//std::unique_ptr<juce::AudioFormatReader>
+void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, const double& dOutSampleRate) {
     
         juce::AudioSampleBuffer temp;
     
