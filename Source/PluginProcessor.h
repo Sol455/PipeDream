@@ -72,8 +72,6 @@ public:
     juce::dsp::Convolution irLoader;
     
     juce::AudioSampleBuffer fileBuffer;
-
-
     
     
     static juce::String getPathtoIRFolder()

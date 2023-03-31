@@ -92,4 +92,6 @@ void PipeDreamAudioProcessorEditor::resized()
     
     loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
     irName.setBounds(loadBtn.getX() + loadBtn.getWidth(), btnY, btnWidth * 2, btnHeight);
+    
+    PitchSel1Slider.setBounds (getWidth() / 2 - 100, getHeight() /2 - 50 , 200, 100);
 }

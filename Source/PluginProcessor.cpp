@@ -289,6 +289,10 @@ bool PipeDreamAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    
+    auto g = apvts.getRawParameterValue("PITCHSEL1");
+    std::cout << g->load() <<std::endl;
+    
     juce::ScopedNoDenormals noDenormals;
     
     //auto g = apvts.getRawParameterValue("PITCHSEL1");

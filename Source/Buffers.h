@@ -19,7 +19,6 @@
 class BufferStore
 {
 public:
-    //const float *const* BufBankWriteP (int bufID)
     auto BufBankWriteP (int bufID)
     {
         return bufferBank1[bufID].buffer.getArrayOfWritePointers();
