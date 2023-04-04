@@ -96,10 +96,10 @@ private:
     //==============================================================================
     
     juce::AudioParameterInt* pitchsel1 {nullptr};
-    juce::AudioParameterFloat* pitchsel2 {nullptr};
-    juce::AudioParameterFloat* pitchsel3 {nullptr};
-    juce::AudioParameterFloat* pitchsel4 {nullptr};
-    juce::AudioParameterFloat* pitchsel5 {nullptr};
+    juce::AudioParameterInt* pitchsel2 {nullptr};
+    juce::AudioParameterInt* pitchsel3 {nullptr};
+    juce::AudioParameterInt* pitchsel4 {nullptr};
+    juce::AudioParameterInt* pitchsel5 {nullptr};
     //juce::AudioParameterFloat* midHighCrossover {nullptr};
     
     juce::dsp::ProcessSpec spec;

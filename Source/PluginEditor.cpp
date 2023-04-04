@@ -15,7 +15,7 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    addAndMakeVisible(loadBtn);
+    //addAndMakeVisible(loadBtn);
     loadBtn.setButtonText("Load IR");
     DBG("variable tree in editor = " << static_cast<int>(variableTree.isValid()));
     loadBtn.onClick = [this]()
@@ -51,17 +51,53 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     
     addAndMakeVisible(irName);
     
-    PitchSel1Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    PitchSel1Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 50);
-    addAndMakeVisible(PitchSel1Slider);
+    auto slider_width = 100;
+    auto slider_height = 100;
+    auto slider_spacer = 100;
     
+    auto text_box_height = 50;
+    auto text_box_width = 25;
+    
+    PitchSel1Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    PitchSel2Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    PitchSel3Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    PitchSel4Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    PitchSel5Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    
+    PitchSel1Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    PitchSel2Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    PitchSel3Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    PitchSel4Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    PitchSel5Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    
+    addAndMakeVisible(PitchSel1Slider);
+    addAndMakeVisible(PitchSel2Slider);
+    addAndMakeVisible(PitchSel3Slider);
+    addAndMakeVisible(PitchSel4Slider);
+    addAndMakeVisible(PitchSel5Slider);
+    
+    
+    //200, 100
     
 
     PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_1"/*Params::Names::Pitch_Sel_1*/, PitchSel1Slider);
+    
+    PitchSel2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_2"/*Params::Names::Pitch_Sel_1*/, PitchSel2Slider);
+    
+    PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_3"/*Params::Names::Pitch_Sel_1*/, PitchSel3Slider);
+    
+    PitchSel2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_4"/*Params::Names::Pitch_Sel_1*/, PitchSel4Slider);
+    
+    PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_5"/*Params::Names::Pitch_Sel_1*/, PitchSel5Slider);
+    
 
-    setSize (400, 300);
-                                                                                                 
-    PitchSel1Slider.setBounds (getWidth() / 2 - 100, getHeight() /2 - 50 , 200, 100);
+    setSize (650, 240);
+                                                                                
+    PitchSel1Slider.setBounds (70, getHeight() /2 - 50 , slider_width, slider_height);
+    PitchSel2Slider.setBounds (70 + slider_spacer * 1 , getHeight() /2 - 50 , slider_width, slider_height);
+    PitchSel3Slider.setBounds (70 + slider_spacer * 2 , getHeight() /2 - 50 , slider_width, slider_height);
+    PitchSel4Slider.setBounds (70 + slider_spacer * 3 , getHeight() /2 - 50 , slider_width, slider_height);
+    PitchSel5Slider.setBounds (70 + slider_spacer * 4 , getHeight() /2 - 50 , slider_width, slider_height);
 
 }
 

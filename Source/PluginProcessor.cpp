@@ -37,9 +37,10 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
         };
     
     IntHelper(pitchsel1, Names::Pitch_Sel_1);
-    
-    
-        
+    IntHelper(pitchsel2, Names::Pitch_Sel_2);
+    IntHelper(pitchsel3, Names::Pitch_Sel_3);
+    IntHelper(pitchsel4, Names::Pitch_Sel_4);
+    IntHelper(pitchsel5, Names::Pitch_Sel_5);
 
 }
 
@@ -63,6 +64,30 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         
         layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_1),1},
                                                             params.at(Names::Pitch_Sel_1),
+                                                            -12,
+                                                            12,
+                                                             0));
+        
+        layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_2),1},
+                                                            params.at(Names::Pitch_Sel_2),
+                                                            -12,
+                                                            12,
+                                                             0));
+        
+        layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_3),1},
+                                                            params.at(Names::Pitch_Sel_3),
+                                                            -12,
+                                                            12,
+                                                             0));
+    
+        layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_4),1},
+                                                            params.at(Names::Pitch_Sel_4),
+                                                            -12,
+                                                            12,
+                                                             0));
+        
+        layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_5),1},
+                                                            params.at(Names::Pitch_Sel_5),
                                                             -12,
                                                             12,
                                                              0));
@@ -143,7 +168,7 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
     //0,1 2
-    readIRFromFile(2, 0);
+    readIRFromFile(0, 0);
     //readIRFromFile(1, 1);
     //readIRFromFile(2, 2);
     irLoader.reset();

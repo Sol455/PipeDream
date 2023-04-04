@@ -32,8 +32,16 @@ private:
     juce::ValueTree& variableTree;
     
     juce::Slider PitchSel1Slider;
+    juce::Slider PitchSel2Slider;
+    juce::Slider PitchSel3Slider;
+    juce::Slider PitchSel4Slider;
+    juce::Slider PitchSel5Slider;
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel1Attachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel2Attachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel3Attachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel4Attachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel5Attachment;
     
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;
