@@ -29,12 +29,15 @@ public:
         return bufferBank1[bufID].buffer.getArrayOfReadPointers();
     }
     
+    auto BufBankBufferWriteP1 (int bufID, int pointer)
+    {
+        return bufferBank1[bufID].buffer.getWritePointer(pointer);
+    }
+    
     void SetBufferSize (int buffernum, int numberofChannels, int numberofSamples)
     {
-        //for(int i = 0; i < 12; i++ ) {
-            bufferBank1[buffernum].buffer.setSize(numberofChannels, numberofSamples, true, false, false);
-            //return bufferBank1[bufID];
-       // }
+            //bufferBank1[buffernum].buffer.setSize(numberofChannels, numberofSamples, true, false, false);
+        bufferBank1[buffernum].buffer.setSize(numberofChannels, numberofSamples);
     }
     
     void SetInfoAll (int numberofChannels, int numberofSamples)
@@ -43,6 +46,12 @@ public:
             bufferBank1[i].buffer.setSize(numberofChannels, numberofSamples, true, false, false);
             //return bufferBank1[bufID];
         }
+    }
+    
+    void SetInfo1 (int buffernum, int numberofChannels, int numberofSamples)
+    {
+            bufferBank1[buffernum].buffer.setSize(numberofChannels, numberofSamples, true, false, false);
+            //return bufferBank1[bufID];
     }
     
     void SetSampleRate (int bufID, double sampleRate)
