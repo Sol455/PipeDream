@@ -168,9 +168,16 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 
     readIRFromFile(2, 0);
     
-    for (int i = 0; i < 5; i ++) {
-        convObjects[i].reset();
-        convObjects[i].prepare(spec);
+//    for (int i = 0; i < 5; i ++) {
+//        convObjects[i].reset();
+//        convObjects[i].prepare(spec);
+//    }
+    
+    ParallelConvs.prepare(spec);
+    
+    for(auto& buffer: audioSplitBuffers)
+    {
+        buffer.setSize(spec.numChannels, samplesPerBlock);
     }
 }
     
@@ -190,13 +197,6 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
             jassertfalse;
             return;
         }
-        
-        //set all buffer classes to IR sample rate
-        //bufferStore.SetInfoAll(static_cast<int> (reader->numChannels), static_cast<int>(reader->lengthInSamples));
-
-        //read the File to the buffer
-//        reader->read (bufferStore.BufBankWriteP(IRtoWrite), bufferStore.getChannels(IRtoWrite), 0, bufferStore.getSamples(IRtoWrite));
-//        bufferStore.SetSampleRate(IRtoWrite, reader->sampleRate);
         
         repitchBuffer(reader, 0, -12);
         repitchBuffer(reader, 1, -11);
@@ -236,7 +236,7 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
          delete reader;
     }
 }
-//std::unique_ptr<juce::AudioFormatReader>
+
 void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitoneIn) {
     
     float semitoneToPhase;
@@ -308,18 +308,25 @@ void PipeDreamAudioProcessor::updateCurrentIRs() {
     for(int i = 0; i < 5; i ++) {
         int z = i;
         bufferTransfers[i].get ([this, z] (BufferWithSampleRate& buf)
-        {
+                                {
             
-            convObjects[z].loadImpulseResponse (std::move (buf.buffer),
-                                             buf.sampleRate,
-                                             juce::dsp::Convolution::Stereo::yes,
-                                             juce::dsp::Convolution::Trim::yes,
-                                             juce::dsp::Convolution::Normalise::yes);
+            ParallelConvs.processors[z].loadImpulseResponse (std::move (buf.buffer),
+                                                             buf.sampleRate,
+                                                             juce::dsp::Convolution::Stereo::yes,
+                                                             juce::dsp::Convolution::Trim::yes,
+                                                             juce::dsp::Convolution::Normalise::yes);
         });
     }
     
+    
+    //    for (auto& convInstance : ParallelConvs.processors)
+    //            *convInstance.loadImpulseResponse (std::move (buf.buffer),
+    //                                                buf.sampleRate,
+    //                                                juce::dsp::Convolution::Stereo::yes,
+    //                                                juce::dsp::Convolution::Trim::yes,
+    //                                                juce::dsp::Convolution::Normalise::yes);
+    //}
 }
-
 
 void PipeDreamAudioProcessor::setCurrentIRs() {
     
@@ -385,14 +392,28 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     setCurrentIRs();
 
     juce::dsp::AudioBlock<float> block {buffer};
+    auto conteky = juce::dsp::ProcessContextReplacing<float>(block);
+    //juce::dsp::AudioBlock<float> block2 {buffer};
+    //juce::dsp::AudioBlock<float> block3 {buffer};
     
     updateCurrentIRs();
 
-    //splitAudio(buffer);
+    splitAudio(buffer);
     
-    for(int i =0; i < 2; i++) {
-        convObjects[i].process(juce::dsp::ProcessContextReplacing<float>(block));
-    }
+    ParallelConvs.process(conteky);
+    
+    //auto Blocky = juce::dsp::AudioBlock<float>(audioSplitBuffers[0]);
+    //auto conteky = juce::dsp::ProcessContextReplacing<float>(Blocky);
+    
+    //for(int i =0; i < 1; i++) {
+        //convObjects[i].process(juce::dsp::ProcessContextReplacing<float>(block));
+        //convObjects[i].process(juce::dsp::ProcessContextReplacing<float>(block));
+        //convObjects[0].process(juce::dsp::ProcessContextReplacing<float>(block1));
+        //convObjects[0].process(juce::dsp::ProcessContextReplacing<float>(block));
+
+        //convObjects[1].process(juce::dsp::ProcessContextReplacing<float>(block2));
+        //convObjects[2].process(juce::dsp::ProcessContextReplacing<float>(block3));
+    //}
    
 
 //    // In case we have more outputs than inputs, this code clears any output

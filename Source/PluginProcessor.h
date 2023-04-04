@@ -13,6 +13,7 @@
 #include "BufferTran.h"
 #include "Buffers.h"
 #include "Params.h"
+#include "ParallelProcessors.h"
 
 //==============================================================================
 /**
@@ -103,6 +104,10 @@ public:
     
     std::array<juce::AudioBuffer<float>, 5> audioSplitBuffers;
     std::array<juce::dsp::Convolution, 5> convObjects;
+    
+    ParallelProcessors<juce::dsp::Convolution, 5> ParallelConvs;
+
+    
     std::array<BufferTransfer, 5> bufferTransfers;
     
 

@@ -5,6 +5,8 @@
               companyWebsite="www.solharter.com" cppLanguageStandard="17" pluginFormats="buildVST3">
   <MAINGROUP id="DJ8px5" name="PipeDream">
     <GROUP id="{DA2250E7-A89F-7E78-0C56-356084F7AAB0}" name="Source">
+      <FILE id="zR6mC9" name="ParallelProcessors.h" compile="0" resource="0"
+            file="Source/ParallelProcessors.h"/>
       <FILE id="axWrwB" name="Params.h" compile="0" resource="0" file="Source/Params.h"/>
       <FILE id="wovQvn" name="Buffers.h" compile="0" resource="0" file="Source/Buffers.h"/>
       <FILE id="g8nMkG" name="BufferTran.h" compile="0" resource="0" file="Source/BufferTran.h"/>
