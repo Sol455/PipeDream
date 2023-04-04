@@ -82,20 +82,7 @@ public:
 
 private:
     
-//    juce::AudioBuffer<float> bufa1;
-//    juce::AudioBuffer<float> bufa2;
-//    juce::AudioBuffer<float> bufa3;
-//    juce::AudioBuffer<float> bufa4;
-//    juce::AudioBuffer<float> bufa5;
-//    juce::AudioBuffer<float> bufa6;
-//    juce::AudioBuffer<float> bufa7;
-//    juce::AudioBuffer<float> bufa8;
-//    juce::AudioBuffer<float> bufa9;
-//    juce::AudioBuffer<float> bufa10;
-//    juce::AudioBuffer<float> bufa11;
-//    juce::AudioBuffer<float> bufa12;
-    
-    BufferWithSampleRate bufferBank1[12] = {
+    BufferWithSampleRate bufferBank1[25] = {
     };
 
 };

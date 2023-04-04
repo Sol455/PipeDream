@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "cmath"
 
 //==============================================================================
 PipeDreamAudioProcessor::PipeDreamAudioProcessor()
@@ -38,23 +39,6 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     IntHelper(pitchsel1, Names::Pitch_Sel_1);
     
     
-    
-    //juce::AudioParameterInt
-        
-    
-//    auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
-//    {
-//        param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
-//        jassert(param !=nullptr);
-//    };
-    
-    
-        //IntHelper(pitchsel1, Names::Pitch_Sel_1);
-    
-        //lowMidCrossover->get();
-        //floatHelper(lowBandComp.release, Names::Release_Low_Band);
-        //floatHelper(lowBandComp.threshold, Names::Threshold_Low_Band);
-    
         
 
 }
@@ -66,41 +50,23 @@ PipeDreamAudioProcessor::~PipeDreamAudioProcessor()
 juce::AudioProcessorValueTreeState::ParameterLayout
     PipeDreamAudioProcessor::createParameterLayout()
 {
-        //std::vector <std::unique_ptr<juce::RangedAudioParameter>> params;
-        
-//        auto inputGainParm = std::make_unique<juce::AudioParameterFloat>(inputGainSliderId, inputGainSliderName, -24.0f, 24.0f, 0.0f);
-          //params.push_back (std::make_unique<juce::AudioParameterInt>(juce::ParameterID{ "Pitch Select 1", 1}, "Pitch_Select_1", -12, 12, 0));
 
-//
-//        params.push_back(std::move(inputGainParm));
-        
-        //return {params.begin(), params.end() };
-        
         
         juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
         using namespace juce;
         using namespace Params;
         const auto& params = GetParams();
-        
-        //auto gainRange = NormalisableRange<float>(-24.f, 24.f, 0.5, 1);
-        
-        //auto pitchRange = NormalisableRange<float>(-24, 24, 1, 1);
-        
-//        layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{params.at(Names::Pitch_Sel_1),1},
-//                                                                                params.at(Names::Pitch_Sel_1),
-//                                                                                pitchRange,
-//                                                                                0));
+       
+
         
         
         layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_1),1},
                                                             params.at(Names::Pitch_Sel_1),
-                                                            -24,
-                                                            24,
+                                                            -12,
+                                                            12,
                                                              0));
-        
-        //<juce::AudioParameterFloat(<#const ParameterID &parameterID#>, <#const String &parameterName#>, <#NormalisableRange<float> normalisableRange#>, <#float defaultValue#>)
-        
+
         return layout;
 }
 
@@ -196,8 +162,8 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
     {
         juce::AudioFormatManager manager;
         manager.registerBasicFormats();
-        std::unique_ptr<juce::AudioFormatReader> reader { manager.createReaderFor (std::move (currentIR)) };
-        //juce::AudioFormatReader reader { manager.createReaderFor (std::move (currentIR)) };
+        //std::unique_ptr<juce::AudioFormatReader> reader { manager.createReaderFor (std::move (currentIR)) };
+        juce::AudioFormatReader *reader { manager.createReaderFor (std::move (currentIR)) };
 
         if (reader == nullptr)
         {
@@ -206,99 +172,83 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
         }
         
         //set all buffer classes to IR sample rate
-        bufferStore.SetInfoAll(static_cast<int> (reader->numChannels), static_cast<int>(reader->lengthInSamples));
+        //bufferStore.SetInfoAll(static_cast<int> (reader->numChannels), static_cast<int>(reader->lengthInSamples));
 
-        
         //read the File to the buffer
 //        reader->read (bufferStore.BufBankWriteP(IRtoWrite), bufferStore.getChannels(IRtoWrite), 0, bufferStore.getSamples(IRtoWrite));
 //        bufferStore.SetSampleRate(IRtoWrite, reader->sampleRate);
         
-        //repitchBuffer(reader, 0, 44000);
-        
-        
-        
-        //==================================repitch test=========================================================
-        
-        juce::AudioSampleBuffer temp;
-        
-        //clear buffers
-        bufferStore.BufBankReadP(bufferNum).clear();
-        temp.clear();
-        
-        double ratio =  reader->sampleRate / 100000;
-
-        //set buffersizes
-        temp.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
-        bufferStore.SetBufferSize(bufferNum, static_cast<int> (reader->numChannels), (static_cast<int>(reader->lengthInSamples)/ ratio));
-        
-        
-        //read file into tempory buffer
-        reader->read(&temp, 0, static_cast<int>(reader->lengthInSamples), 0, true, true);
-        
-        juce::LagrangeInterpolator interpolator;
-                    int iResult = 0;
-                    std::cout << reader->numChannels;
-                    for (int i = 0; i < reader->numChannels; i++) {
-                        iResult = interpolator.process(ratio,
-                            temp.getReadPointer(i),
-                            //bufferStore.BufBankBuffer.getWritePointer(i),
-                            bufferStore.BufBankBufferWriteP1(bufferNum, i),
-                            bufferStore.getSamples(bufferNum));
-                    }
-        
-         bufferStore.SetSampleRate(bufferNum, reader->sampleRate);
-
-//        juce::ScopedPointer<juce::LagrangeInterpolator> resampler = new juce::LagrangeInterpolator();
+        repitchBuffer(reader, 0, -12);
+        repitchBuffer(reader, 1, -11);
+        repitchBuffer(reader, 2, -10);
+        repitchBuffer(reader, 3, -9);
+        repitchBuffer(reader, 4, -8);
+        repitchBuffer(reader, 5, -7);
+        repitchBuffer(reader, 6, -6);
+        repitchBuffer(reader, 7, -5);
+        repitchBuffer(reader, 8, -4);
+        repitchBuffer(reader, 9, -3);
+        repitchBuffer(reader, 10, -2);
+        repitchBuffer(reader, 11, -1);
+        repitchBuffer(reader, 12, 0);
+        repitchBuffer(reader, 13, 1);
+        repitchBuffer(reader, 14, 2);
+        repitchBuffer(reader, 15, 3);
+        repitchBuffer(reader, 16, 4);
+        repitchBuffer(reader, 17, 5);
+        repitchBuffer(reader, 18, 6);
+        repitchBuffer(reader, 19, 7);
+        repitchBuffer(reader, 20, 8);
+        repitchBuffer(reader, 21, 8);
+        repitchBuffer(reader, 22, 10);
+        repitchBuffer(reader, 23, 11);
+        repitchBuffer(reader, 24, 12);
+//        for (int i = 1; i < 12; i ++) {
+//            repitchBuffer(reader, i, -(12 - i));
+//       }
 //
-//        const float *const *inputs = temp.getArrayOfReadPointers(); //temp.getArrayOfReadPointers();
-//        float *const*  outputs = bufferStore.BufBankWriteP(bufferNum); //float **outputs = waveBuffer.getArrayOfWritePointers();
-//        for (int c = 0; c < bufferStore.getChannels(bufferNum); c++)
-//        {
-//            resampler->reset();
-//            resampler->process(ratio, inputs[c], outputs[c], bufferStore.getSamples(bufferNum)); //.getNumSamples());
-//        }
+//        for (int i = 12; i <= 24; i++) {
+//            repitchBuffer(reader, i, (i - 12));
+//       }
         
+//            repitchBuffer(reader, 4, 100000, -2);
+//            repitchBuffer(reader, 5, 200000, 3);
+         delete reader;
     }
 }
 //std::unique_ptr<juce::AudioFormatReader>
-void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, const double& dOutSampleRate) {
+void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitoneIn) {
     
-        juce::AudioSampleBuffer temp;
+    float semitoneToPhase;
+    semitoneToPhase = pow(2.0, semitoneIn/12.0);
+    std::cout << "\t\n\nsemitone:" << semitoneToPhase;
     
-        //sofar = 0;
+    juce::AudioSampleBuffer temp;
+    //clear buffers
+    bufferStore.BufBankReadP(bufferNum).clear();
+    temp.clear();
     
-        //clear buffers
-        bufferStore.BufBankReadP(bufferNum).clear();
-        //waveBuffer.clear();
-        temp.clear();
+    double ratio =  semitoneToPhase;//dOutSampleRate; reader->sampleRate / dOutSampleRate;
+    std::cout << "\t\n\nre-campling ratio:" << semitoneToPhase;
+
+    //set buffer Sizes
+    temp.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
+    bufferStore.SetBufferSize(bufferNum, static_cast<int> (reader->numChannels), (static_cast<int>(reader->lengthInSamples)/ ratio));
     
-        //double ratio =  reader->sampleRate / dOutSampleRate;
+    //read file into tempory buffer
+    reader->read(&temp, 0, static_cast<int>(reader->lengthInSamples), 0, true, true);
     
-        temp.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
+    juce::LagrangeInterpolator interpolator;
+                int iResult = 0;
+                std::cout << reader->numChannels;
+                for (int i = 0; i < reader->numChannels; i++) {
+                    iResult = interpolator.process(ratio,
+                        temp.getReadPointer(i),
+                        bufferStore.BufBankBufferWriteP1(bufferNum, i),
+                        bufferStore.getSamples(bufferNum));
+                }
     
-        //next to do
-        bufferStore.SetBufferSize(bufferNum, static_cast<int> (reader->numChannels), ((static_cast<int>(reader->lengthInSamples))/ 1.1));
-        
-    
-    //waveBuffer.setSize((int)reader->numChannels, (int)(((double)reader->lengthInSamples) / ratio));
-    
-        reader->read(&temp, 0, (int)reader->lengthInSamples, 0, true, true);
-    
-        juce::ScopedPointer<juce::LagrangeInterpolator> resampler = new juce::LagrangeInterpolator();
-    
-        const float *const * inputs  = bufferStore.BufBankarrayReadP(bufferNum); //temp.getArrayOfReadPointers();
-        float *const*  outputs = bufferStore.BufBankWriteP(bufferNum);
-        //float **outputs = waveBuffer.getArrayOfWritePointers();
-        for (int c = 0; c < bufferStore.getChannels(bufferNum); c++)
-        {
-            resampler->reset();
-            resampler->process(1.1, inputs[c], outputs[c], bufferStore.getSamples(bufferNum)); //.getNumSamples());
-        }
-    
-//        float semitone_to_phase_delta(float inSemitoneValue)
-//        {
-//            return pow(2.0, inSemitoneValue/12.0);
-//        }
+     bufferStore.SetSampleRate(bufferNum, reader->sampleRate);
     
 }
 
@@ -338,7 +288,7 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 {
     
     auto g = apvts.getRawParameterValue("Pitch_Sel_1");
-    std::cout << g->load() <<std::endl;
+    //std::cout << g->load() <<std::endl;
     
     juce::ScopedNoDenormals noDenormals;
     
@@ -348,7 +298,7 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
-    auto pitches1 = pitchsel1->get();
+    auto pitches1 = pitchsel1->get() + 12;
     
     bufferTransfer.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches1)),
                                                 bufferStore.GetSampleRate(pitches1)});

@@ -60,7 +60,8 @@ public:
     void readIRFromFile(int IRNum, int IRtoWrite);
     //void rePitchBuffer(int test);
     //void repitchBuffer(juce::AudioFormatReader* reader, int bufferNum);
-    void repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, const double& dOutSampleRate);
+    void repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitone);
+
     
     juce::AudioProcessorValueTreeState apvts;
 
