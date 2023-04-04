@@ -167,19 +167,11 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.numChannels = getTotalNumOutputChannels();
 
     readIRFromFile(2, 0);
-
-    conv1.reset();
-    conv1.prepare(spec);
-    conv2.reset();
-    conv2.prepare(spec);
-    conv3.reset();
-    conv3.prepare(spec);
-    conv4.reset();
-    conv4.prepare(spec);
-    conv5.reset();
-    conv5.prepare(spec);
-   
     
+    for (int i = 0; i < 5; i ++) {
+        convObjects[i].reset();
+        convObjects[i].prepare(spec);
+    }
 }
     
 void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
@@ -313,71 +305,39 @@ bool PipeDreamAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 
 void PipeDreamAudioProcessor::updateCurrentIRs() {
     
-    bufferTransfer1.get ([this] (BufferWithSampleRate& buf)
-    {
-        conv1.loadImpulseResponse (std::move (buf.buffer),
-                                         buf.sampleRate,
-                                         juce::dsp::Convolution::Stereo::yes,
-                                         juce::dsp::Convolution::Trim::yes,
-                                         juce::dsp::Convolution::Normalise::yes);
-    });
+    for(int i = 0; i < 5; i ++) {
+        int z = i;
+        bufferTransfers[i].get ([this, z] (BufferWithSampleRate& buf)
+        {
+            
+            convObjects[z].loadImpulseResponse (std::move (buf.buffer),
+                                             buf.sampleRate,
+                                             juce::dsp::Convolution::Stereo::yes,
+                                             juce::dsp::Convolution::Trim::yes,
+                                             juce::dsp::Convolution::Normalise::yes);
+        });
+    }
     
-    bufferTransfer2.get ([this] (BufferWithSampleRate& buf)
-    {
-        conv2.loadImpulseResponse (std::move (buf.buffer),
-                                         buf.sampleRate,
-                                         juce::dsp::Convolution::Stereo::yes,
-                                         juce::dsp::Convolution::Trim::yes,
-                                         juce::dsp::Convolution::Normalise::yes);
-    });
-    
-    bufferTransfer3.get ([this] (BufferWithSampleRate& buf)
-    {
-        conv3.loadImpulseResponse (std::move (buf.buffer),
-                                         buf.sampleRate,
-                                         juce::dsp::Convolution::Stereo::yes,
-                                         juce::dsp::Convolution::Trim::yes,
-                                         juce::dsp::Convolution::Normalise::yes);
-    });
-    
-    bufferTransfer4.get ([this] (BufferWithSampleRate& buf)
-    {
-        conv4.loadImpulseResponse (std::move (buf.buffer),
-                                         buf.sampleRate,
-                                         juce::dsp::Convolution::Stereo::yes,
-                                         juce::dsp::Convolution::Trim::yes,
-                                         juce::dsp::Convolution::Normalise::yes);
-    });
-    
-    bufferTransfer5.get ([this] (BufferWithSampleRate& buf)
-    {
-        conv5.loadImpulseResponse (std::move (buf.buffer),
-                                         buf.sampleRate,
-                                         juce::dsp::Convolution::Stereo::yes,
-                                         juce::dsp::Convolution::Trim::yes,
-                                         juce::dsp::Convolution::Normalise::yes);
-    });
 }
 
 
 void PipeDreamAudioProcessor::setCurrentIRs() {
     
-    auto pitches1 = pitchsel1->get() + 12;
-    auto pitches2 = pitchsel2->get() + 12;
-    auto pitches3 = pitchsel3->get() + 12;
-    auto pitches4 = pitchsel4->get() + 12;
-    auto pitches5 = pitchsel5->get() + 12;
+    std::array<int, 5> pitches;
     
-    bufferTransfer1.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches1)),
-                                                bufferStore.GetSampleRate(pitches1)});
-    bufferTransfer2.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches2)),
-                                                bufferStore.GetSampleRate(pitches2)});
-    bufferTransfer3.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches3)),
-                                                bufferStore.GetSampleRate(pitches3)});
-    bufferTransfer4.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches4)),
-                                                bufferStore.GetSampleRate(pitches4)});
-    bufferTransfer5.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches5)),
-                                                bufferStore.GetSampleRate(pitches5)});
+    pitches = {
+        pitchsel1->get() + 12,
+        pitchsel2->get() + 12,
+        pitchsel3->get() + 12,
+        pitchsel4->get() + 12,
+        pitchsel5->get() + 12
+    };
+    
+    for (int i = 0; i < 5; i++){
+        bufferTransfers[i].set(BufferWithSampleRate {std::move (bufferStore.BufBankReadP(pitches[i])),
+                                                    bufferStore.GetSampleRate(pitches[i])});
+    }
+
 }
 
 void PipeDreamAudioProcessor::splitAudio(const juce::AudioBuffer<float> &inputBuffer) {
@@ -430,20 +390,11 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     //splitAudio(buffer);
     
-     conv1.process(juce::dsp::ProcessContextReplacing<float>(block));
-    //conv2.process(juce::dsp::ProcessContextReplacing<float>(block));
-    //conv3.process(juce::dsp::ProcessContextReplacing<float>(audioSplitBuffers[2]));
-//    conv3.process(juce::dsp::ProcessContextReplacing<float>(block));
-//    conv4.process(juce::dsp::ProcessContextReplacing<float>(block));
-//    conv5.process(juce::dsp::ProcessContextReplacing<float>(block));
+    for(int i =0; i < 2; i++) {
+        convObjects[i].process(juce::dsp::ProcessContextReplacing<float>(block));
+    }
+   
 
-
-    
-    
-//    if (irLoader.getCurrentIRSize() > 0)
-//    {
-//        irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
-//    }
 //    // In case we have more outputs than inputs, this code clears any output
 //    // channels that didn't contain input data, (because these aren't
 //    // guaranteed to be empty - they may contain garbage).

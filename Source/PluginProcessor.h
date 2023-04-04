@@ -102,7 +102,8 @@ public:
     juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
     
     std::array<juce::AudioBuffer<float>, 5> audioSplitBuffers;
-    //std::array<juce::dsp::Convolution>, 5> convObjects;
+    std::array<juce::dsp::Convolution, 5> convObjects;
+    std::array<BufferTransfer, 5> bufferTransfers;
     
 
     
