@@ -37,7 +37,7 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
                 
                 //variableTree.setProperty("FilePath2", "WAG1", nullptr);
                 //audioProcessor.variableTree.setProperty("Root", audioProcessor.savedFile.getParentDirectory().getFullPathName(), nullptr);
-                audioProcessor.irLoader.reset();
+                audioProcessor.conv1.reset();
 //                audioProcessor.irLoader.loadImpulseResponse(audioProcessor.savedFile,
 //                                                            juce::dsp::Convolution::Stereo::yes,
 //                                                            juce::dsp::Convolution::Trim::yes,
@@ -80,16 +80,16 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     //200, 100
     
 
-    PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_1"/*Params::Names::Pitch_Sel_1*/, PitchSel1Slider);
+    PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_1", PitchSel1Slider);
     
-    PitchSel2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_2"/*Params::Names::Pitch_Sel_1*/, PitchSel2Slider);
-    
-    PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_3"/*Params::Names::Pitch_Sel_1*/, PitchSel3Slider);
-    
-    PitchSel2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_4"/*Params::Names::Pitch_Sel_1*/, PitchSel4Slider);
-    
-    PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_5"/*Params::Names::Pitch_Sel_1*/, PitchSel5Slider);
-    
+    PitchSel2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_2", PitchSel2Slider);
+
+    PitchSel3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_3", PitchSel3Slider);
+
+    PitchSel4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_4", PitchSel4Slider);
+
+    PitchSel5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_5", PitchSel5Slider);
+
 
     setSize (650, 240);
                                                                                 

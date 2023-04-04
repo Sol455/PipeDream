@@ -61,16 +61,21 @@ public:
     //void rePitchBuffer(int test);
     //void repitchBuffer(juce::AudioFormatReader* reader, int bufferNum);
     void repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitone);
+    void splitAudio(const juce::AudioBuffer<float> &inputBuffer);
+    void updateCurrentIRs();
+    void setCurrentIRs();
 
     
     juce::AudioProcessorValueTreeState apvts;
-
-    
     juce::ValueTree& getVariableTree(){ return variableTree; };
     
-    
     juce::File root, savedFile, currentIR;
-    juce::dsp::Convolution irLoader;
+    
+    juce::dsp::Convolution conv1;
+    juce::dsp::Convolution conv2;
+    juce::dsp::Convolution conv3;
+    juce::dsp::Convolution conv4;
+    juce::dsp::Convolution conv5;
     
     juce::AudioSampleBuffer fileBuffer;
     
@@ -86,10 +91,19 @@ public:
     
     juce::String FilePath = getPathtoIRFolder();
     
-    BufferTransfer bufferTransfer;
+    BufferTransfer bufferTransfer1;
+    BufferTransfer bufferTransfer2;
+    BufferTransfer bufferTransfer3;
+    BufferTransfer bufferTransfer4;
+    BufferTransfer bufferTransfer5;
+
     BufferStore bufferStore;
     
     juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
+    
+    std::array<juce::AudioBuffer<float>, 5> audioSplitBuffers;
+    //std::array<juce::dsp::Convolution>, 5> convObjects;
+    
 
     
 private:

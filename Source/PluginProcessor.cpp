@@ -60,8 +60,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         const auto& params = GetParams();
        
 
-        
-        
         layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_1),1},
                                                             params.at(Names::Pitch_Sel_1),
                                                             -12,
@@ -167,15 +165,20 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
-    //0,1 2
-    readIRFromFile(0, 0);
-    //readIRFromFile(1, 1);
-    //readIRFromFile(2, 2);
-    irLoader.reset();
-    irLoader.prepare(spec);
-    
-    //auto g = apvts.getRawParameterValue("PITCHSEL1");
-    //apvts.getRawParameterValue(<#StringRef parameterID#>)
+
+    readIRFromFile(2, 0);
+
+    conv1.reset();
+    conv1.prepare(spec);
+    conv2.reset();
+    conv2.prepare(spec);
+    conv3.reset();
+    conv3.prepare(spec);
+    conv4.reset();
+    conv4.prepare(spec);
+    conv5.reset();
+    conv5.prepare(spec);
+   
     
 }
     
@@ -246,7 +249,6 @@ void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int
     
     float semitoneToPhase;
     semitoneToPhase = pow(2.0, semitoneIn/12.0);
-    std::cout << "\t\n\nsemitone:" << semitoneToPhase;
     
     juce::AudioSampleBuffer temp;
     //clear buffers
@@ -254,7 +256,6 @@ void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int
     temp.clear();
     
     double ratio =  semitoneToPhase;//dOutSampleRate; reader->sampleRate / dOutSampleRate;
-    std::cout << "\t\n\nre-campling ratio:" << semitoneToPhase;
 
     //set buffer Sizes
     temp.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
@@ -309,37 +310,133 @@ bool PipeDreamAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 }
 #endif
 
-void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
-{
-    
-    auto g = apvts.getRawParameterValue("Pitch_Sel_1");
-    //std::cout << g->load() <<std::endl;
-    
-    juce::ScopedNoDenormals noDenormals;
-    
-    //auto g = apvts.getRawParameterValue("PITCHSEL1");
-    //std::cout << g->load() <<std::endl;
-    
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-    
-    auto pitches1 = pitchsel1->get() + 12;
-    
-    bufferTransfer.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches1)),
-                                                bufferStore.GetSampleRate(pitches1)});
 
-    juce::dsp::AudioBlock<float> block {buffer};
+void PipeDreamAudioProcessor::updateCurrentIRs() {
     
-    bufferTransfer.get ([this] (BufferWithSampleRate& buf)
+    bufferTransfer1.get ([this] (BufferWithSampleRate& buf)
     {
-        irLoader.loadImpulseResponse (std::move (buf.buffer),
+        conv1.loadImpulseResponse (std::move (buf.buffer),
                                          buf.sampleRate,
                                          juce::dsp::Convolution::Stereo::yes,
                                          juce::dsp::Convolution::Trim::yes,
                                          juce::dsp::Convolution::Normalise::yes);
     });
     
-    irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
+    bufferTransfer2.get ([this] (BufferWithSampleRate& buf)
+    {
+        conv2.loadImpulseResponse (std::move (buf.buffer),
+                                         buf.sampleRate,
+                                         juce::dsp::Convolution::Stereo::yes,
+                                         juce::dsp::Convolution::Trim::yes,
+                                         juce::dsp::Convolution::Normalise::yes);
+    });
+    
+    bufferTransfer3.get ([this] (BufferWithSampleRate& buf)
+    {
+        conv3.loadImpulseResponse (std::move (buf.buffer),
+                                         buf.sampleRate,
+                                         juce::dsp::Convolution::Stereo::yes,
+                                         juce::dsp::Convolution::Trim::yes,
+                                         juce::dsp::Convolution::Normalise::yes);
+    });
+    
+    bufferTransfer4.get ([this] (BufferWithSampleRate& buf)
+    {
+        conv4.loadImpulseResponse (std::move (buf.buffer),
+                                         buf.sampleRate,
+                                         juce::dsp::Convolution::Stereo::yes,
+                                         juce::dsp::Convolution::Trim::yes,
+                                         juce::dsp::Convolution::Normalise::yes);
+    });
+    
+    bufferTransfer5.get ([this] (BufferWithSampleRate& buf)
+    {
+        conv5.loadImpulseResponse (std::move (buf.buffer),
+                                         buf.sampleRate,
+                                         juce::dsp::Convolution::Stereo::yes,
+                                         juce::dsp::Convolution::Trim::yes,
+                                         juce::dsp::Convolution::Normalise::yes);
+    });
+}
+
+
+void PipeDreamAudioProcessor::setCurrentIRs() {
+    
+    auto pitches1 = pitchsel1->get() + 12;
+    auto pitches2 = pitchsel2->get() + 12;
+    auto pitches3 = pitchsel3->get() + 12;
+    auto pitches4 = pitchsel4->get() + 12;
+    auto pitches5 = pitchsel5->get() + 12;
+    
+    bufferTransfer1.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches1)),
+                                                bufferStore.GetSampleRate(pitches1)});
+    bufferTransfer2.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches2)),
+                                                bufferStore.GetSampleRate(pitches2)});
+    bufferTransfer3.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches3)),
+                                                bufferStore.GetSampleRate(pitches3)});
+    bufferTransfer4.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches4)),
+                                                bufferStore.GetSampleRate(pitches4)});
+    bufferTransfer5.set (BufferWithSampleRate { std::move (bufferStore.BufBankReadP(pitches5)),
+                                                bufferStore.GetSampleRate(pitches5)});
+}
+
+void PipeDreamAudioProcessor::splitAudio(const juce::AudioBuffer<float> &inputBuffer) {
+    for(auto& fb: audioSplitBuffers)
+    {
+        fb = inputBuffer;
+    }
+    auto sb0Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[0]);
+    auto sb1Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[1]);
+    auto sb2Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[2]);
+    auto sb3Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[3]);
+    auto sb4Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[4]);
+
+    auto sb0Ctx = juce::dsp::ProcessContextReplacing<float>(sb0Block);
+    auto sb1Ctx = juce::dsp::ProcessContextReplacing<float>(sb1Block);
+    auto sb2Ctx = juce::dsp::ProcessContextReplacing<float>(sb2Block);
+    auto sb3Ctx = juce::dsp::ProcessContextReplacing<float>(sb3Block);
+    auto sb4Ctx = juce::dsp::ProcessContextReplacing<float>(sb4Block);
+    
+    //conv1.process(sb0Ctx);
+    //put filtering here
+//
+//    LP1.process(fb0Ctx);
+//    AP2.process(fb0Ctx);
+//
+//    HP1.process(fb1Ctx);
+//    filterBuffers[2] = filterBuffers[1];
+//    LP2.process(fb1Ctx);
+//
+//    HP2.process(fb2Ctx);
+    
+}
+
+void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+{
+    
+    //auto g = apvts.getRawParameterValue("Pitch_Sel_1");
+    //std::cout << g->load() <<std::endl;
+    
+    juce::ScopedNoDenormals noDenormals;
+    
+    auto totalNumInputChannels  = getTotalNumInputChannels();
+    auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    setCurrentIRs();
+
+    juce::dsp::AudioBlock<float> block {buffer};
+    
+    updateCurrentIRs();
+
+    //splitAudio(buffer);
+    
+     conv1.process(juce::dsp::ProcessContextReplacing<float>(block));
+    //conv2.process(juce::dsp::ProcessContextReplacing<float>(block));
+    //conv3.process(juce::dsp::ProcessContextReplacing<float>(audioSplitBuffers[2]));
+//    conv3.process(juce::dsp::ProcessContextReplacing<float>(block));
+//    conv4.process(juce::dsp::ProcessContextReplacing<float>(block));
+//    conv5.process(juce::dsp::ProcessContextReplacing<float>(block));
+
 
     
     
