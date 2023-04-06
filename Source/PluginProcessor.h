@@ -91,25 +91,24 @@ public:
     }
     
     juce::String FilePath = getPathtoIRFolder();
-    
-    BufferTransfer bufferTransfer1;
-    BufferTransfer bufferTransfer2;
-    BufferTransfer bufferTransfer3;
-    BufferTransfer bufferTransfer4;
-    BufferTransfer bufferTransfer5;
 
     BufferStore bufferStore;
     
     juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
     
+    //split buffers (prep for filtering)
     std::array<juce::AudioBuffer<float>, 5> audioSplitBuffers;
+    
     std::array<juce::dsp::Convolution, 5> convObjects;
     
+    
+    //Parallel instances
     ParallelProcessors<juce::dsp::Convolution, 5> ParallelConvs;
 
-    
+    //buffer transfes
     std::array<BufferTransfer, 5> bufferTransfers;
     
+    //gain
 
     
 private:
@@ -120,6 +119,15 @@ private:
     juce::AudioParameterInt* pitchsel3 {nullptr};
     juce::AudioParameterInt* pitchsel4 {nullptr};
     juce::AudioParameterInt* pitchsel5 {nullptr};
+    
+    juce::AudioParameterFloat* outGain1 {nullptr};
+    juce::AudioParameterFloat* outGain2 {nullptr};
+    juce::AudioParameterFloat* outGain3 {nullptr};
+    juce::AudioParameterFloat* outGain4 {nullptr};
+    juce::AudioParameterFloat* outGain5 {nullptr};
+    
+    std::array<juce::dsp::Gain<float>, 5> outGains;
+
     //juce::AudioParameterFloat* midHighCrossover {nullptr};
     
     juce::dsp::ProcessSpec spec;

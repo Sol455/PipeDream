@@ -51,10 +51,6 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     
     addAndMakeVisible(irName);
     
-    auto slider_width = 100;
-    auto slider_height = 100;
-    auto slider_spacer = 100;
-    
     auto text_box_height = 50;
     auto text_box_width = 25;
     
@@ -70,34 +66,49 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     PitchSel4Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
     PitchSel5Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
     
+    GainOut1Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    GainOut2Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    GainOut3Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    GainOut4Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    GainOut5Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    
+    GainOut1Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    GainOut2Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    GainOut3Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    GainOut4Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    GainOut5Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    
     addAndMakeVisible(PitchSel1Slider);
     addAndMakeVisible(PitchSel2Slider);
     addAndMakeVisible(PitchSel3Slider);
     addAndMakeVisible(PitchSel4Slider);
     addAndMakeVisible(PitchSel5Slider);
     
+    addAndMakeVisible(GainOut1Slider);
+    addAndMakeVisible(GainOut2Slider);
+    addAndMakeVisible(GainOut3Slider);
+    addAndMakeVisible(GainOut4Slider);
+    addAndMakeVisible(GainOut5Slider);
     
-    //200, 100
     
-
     PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_1", PitchSel1Slider);
-    
     PitchSel2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_2", PitchSel2Slider);
-
     PitchSel3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_3", PitchSel3Slider);
-
     PitchSel4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_4", PitchSel4Slider);
-
     PitchSel5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_5", PitchSel5Slider);
+    
+    
+    GainOut1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_1", GainOut1Slider);
+    GainOut2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_2", GainOut2Slider);
+    GainOut3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_3", GainOut3Slider);
+    GainOut4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_4", GainOut4Slider);
+    GainOut5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_5", GainOut5Slider);
 
 
     setSize (650, 240);
                                                                                 
-    PitchSel1Slider.setBounds (70, getHeight() /2 - 50 , slider_width, slider_height);
-    PitchSel2Slider.setBounds (70 + slider_spacer * 1 , getHeight() /2 - 50 , slider_width, slider_height);
-    PitchSel3Slider.setBounds (70 + slider_spacer * 2 , getHeight() /2 - 50 , slider_width, slider_height);
-    PitchSel4Slider.setBounds (70 + slider_spacer * 3 , getHeight() /2 - 50 , slider_width, slider_height);
-    PitchSel5Slider.setBounds (70 + slider_spacer * 4 , getHeight() /2 - 50 , slider_width, slider_height);
+    
+    //add menu item
 
 }
 
@@ -108,9 +119,25 @@ PipeDreamAudioProcessorEditor::~PipeDreamAudioProcessorEditor()
 //==============================================================================
 void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
 {
+    auto sidePaddingWidth = 120;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    
+    
+    juce::Rectangle<int> filterControlsR = filterControls.getBounds();
+    juce::Rectangle<int> chordControlsR = chordControls.getBounds();
+    juce::Rectangle<int> pitchSelControlR = pitchSelControls.getBounds();
+    juce::Rectangle<int> gainControlsR = gainControls.getBounds();
 
+    g.setColour(juce::Colours::grey);
+    g.fillRect(pitchSelControlR);
+    g.setColour(juce::Colours::darkgrey);
+    g.fillRect(gainControlsR);
+    
+    g.setColour(juce::Colours::red);
+    g.drawRect(filterControlsR);
+    g.drawRect(chordControlsR);
+    
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
     //g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
@@ -120,14 +147,71 @@ void PipeDreamAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
+    auto sidePaddingWidth = 120;
+    
+    auto bounds = getLocalBounds();
     
     const auto btnX = getWidth() * 0.35;
     const auto btnY = getHeight() * 0.15;
     const auto btnWidth = getWidth() * 0.15;
     const auto btnHeight = btnWidth * 0.5;
     
+    
     loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
     irName.setBounds(loadBtn.getX() + loadBtn.getWidth(), btnY, btnWidth * 2, btnHeight);
     
-    PitchSel1Slider.setBounds (getWidth() / 2 - 100, getHeight() /2 - 50 , 200, 100);
+    filterControls.setBounds(bounds.removeFromLeft(sidePaddingWidth));
+    chordControls.setBounds(bounds.removeFromRight(sidePaddingWidth));
+    pitchSelControls.setBounds(bounds.removeFromTop(bounds.getHeight()/2));
+    gainControls.setBounds(bounds);
+
+    //pitch flex box
+     auto pitchBounds = pitchSelControls.getBounds().reduced(10);
+
+     juce::FlexBox flexBoxpitch;
+     flexBoxpitch.flexDirection = juce::FlexBox::Direction::row;
+     flexBoxpitch.flexWrap = juce::FlexBox::Wrap::noWrap;
+     
+     auto spacer = juce::FlexItem().withWidth(2);
+     
+     flexBoxpitch.items.add(spacer);
+     flexBoxpitch.items.add(juce::FlexItem(PitchSel1Slider).withFlex(1.f));
+     flexBoxpitch.items.add(spacer);
+     flexBoxpitch.items.add(juce::FlexItem(PitchSel2Slider).withFlex(1.f));
+     flexBoxpitch.items.add(spacer);
+     flexBoxpitch.items.add(juce::FlexItem(PitchSel3Slider).withFlex(1.f));
+     flexBoxpitch.items.add(spacer);
+     flexBoxpitch.items.add(juce::FlexItem(PitchSel4Slider).withFlex(1.f));
+     flexBoxpitch.items.add(spacer);
+     flexBoxpitch.items.add(juce::FlexItem(PitchSel5Slider).withFlex(1.f));
+     flexBoxpitch.items.add(spacer);
+    
+     flexBoxpitch.performLayout(pitchBounds);
+    
+    //gain flexbox
+    
+    auto gainBounds = gainControls.getBounds().reduced(10);
+
+    juce::FlexBox flexBoxgain;
+    flexBoxgain.flexDirection = juce::FlexBox::Direction::row;
+    flexBoxgain.flexWrap = juce::FlexBox::Wrap::noWrap;
+    
+    //auto spacer = juce::FlexItem().withWidth(2);
+    
+    flexBoxgain.items.add(spacer);
+    flexBoxgain.items.add(juce::FlexItem(GainOut1Slider).withFlex(1.f));
+    flexBoxgain.items.add(spacer);
+    flexBoxgain.items.add(juce::FlexItem(GainOut2Slider).withFlex(1.f));
+    flexBoxgain.items.add(spacer);
+    flexBoxgain.items.add(juce::FlexItem(GainOut3Slider).withFlex(1.f));
+    flexBoxgain.items.add(spacer);
+    flexBoxgain.items.add(juce::FlexItem(GainOut4Slider).withFlex(1.f));
+    flexBoxgain.items.add(spacer);
+    flexBoxgain.items.add(juce::FlexItem(GainOut5Slider).withFlex(1.f));
+    flexBoxgain.items.add(spacer);
+   
+    flexBoxgain.performLayout(gainBounds);
+   
+    
+    
 }

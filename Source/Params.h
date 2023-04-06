@@ -20,6 +20,13 @@ enum Names {
     Pitch_Sel_3,
     Pitch_Sel_4,
     Pitch_Sel_5,
+    
+    Gain_Out_1,
+    Gain_Out_2,
+    Gain_Out_3,
+    Gain_Out_4,
+    Gain_Out_5
+    
 };
 inline const std::map<Names, juce::String>& GetParams()
 {
@@ -31,6 +38,12 @@ inline const std::map<Names, juce::String>& GetParams()
         {Pitch_Sel_3, "Pitch_Sel_3"},
         {Pitch_Sel_4, "Pitch_Sel_4"},
         {Pitch_Sel_5, "Pitch_Sel_5"},
+        
+        {Gain_Out_1, "Gain_Out_1"},
+        {Gain_Out_2, "Gain_Out_2"},
+        {Gain_Out_3, "Gain_Out_3"},
+        {Gain_Out_4, "Gain_Out_4"},
+        {Gain_Out_5, "Gain_Out_5"},
         
         
     };

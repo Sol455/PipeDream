@@ -30,17 +30,30 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
         using namespace Params;
         const auto& params = GetParams();
         
-        auto IntHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
+    auto IntHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
         {
-            param = dynamic_cast<juce::AudioParameterInt*>(apvts.getParameter(params.at(paramName)));
-            jassert(param !=nullptr);
+        param = dynamic_cast<juce::AudioParameterInt*>(apvts.getParameter(params.at(paramName)));
+        jassert(param !=nullptr);
         };
+    
+    auto floatHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
+       {
+           param = dynamic_cast<juce::AudioParameterFloat*>(apvts.getParameter(params.at(paramName)));
+           jassert(param !=nullptr);
+       };
     
     IntHelper(pitchsel1, Names::Pitch_Sel_1);
     IntHelper(pitchsel2, Names::Pitch_Sel_2);
     IntHelper(pitchsel3, Names::Pitch_Sel_3);
     IntHelper(pitchsel4, Names::Pitch_Sel_4);
     IntHelper(pitchsel5, Names::Pitch_Sel_5);
+    
+    floatHelper(outGain1, Names::Gain_Out_1);
+    floatHelper(outGain2, Names::Gain_Out_2);
+    floatHelper(outGain3, Names::Gain_Out_3);
+    floatHelper(outGain4, Names::Gain_Out_4);
+    floatHelper(outGain5, Names::Gain_Out_5);
+
 
 }
 
@@ -58,8 +71,37 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         using namespace juce;
         using namespace Params;
         const auto& params = GetParams();
+        
+        auto gainRange = NormalisableRange<float>(-24.f, 24.f, 0.5, 1);
+        
+        //gain
+        layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Gain_Out_1), 1},
+                                                        params.at(Names::Gain_Out_1),
+                                                        gainRange,
+                                                        0 ));
+        
+        layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Gain_Out_2), 1},
+                                                        params.at(Names::Gain_Out_2),
+                                                        gainRange,
+                                                        0 ));
+        
+        layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Gain_Out_3), 1},
+                                                        params.at(Names::Gain_Out_3),
+                                                        gainRange,
+                                                        0 ));
+        
+        layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Gain_Out_4), 1},
+                                                        params.at(Names::Gain_Out_4),
+                                                        gainRange,
+                                                        0 ));
+        
+        layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Gain_Out_5), 1},
+                                                        params.at(Names::Gain_Out_5),
+                                                        gainRange,
+                                                        0 ));
        
 
+        //current pitch
         layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_1),1},
                                                             params.at(Names::Pitch_Sel_1),
                                                             -12,
