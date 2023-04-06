@@ -109,6 +109,8 @@ public:
     std::array<BufferTransfer, 5> bufferTransfers;
     
     //gain
+    std::array<float, 5> outGainParams;
+    
 
     
 private:
@@ -127,6 +129,11 @@ private:
     juce::AudioParameterFloat* outGain5 {nullptr};
     
     std::array<juce::dsp::Gain<float>, 5> outGains;
+    
+    
+    juce::dsp::Gain<float> testGain;
+    
+    
 
     //juce::AudioParameterFloat* midHighCrossover {nullptr};
     

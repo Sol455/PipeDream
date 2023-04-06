@@ -211,16 +211,23 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     readIRFromFile(2, 0);
     
 //    for (int i = 0; i < 5; i ++) {
-//        convObjects[i].reset();
-//        convObjects[i].prepare(spec);
+//        outGains[i].prepare(spec);
+//        //outGains[i].setRampDurationSeconds(0.05);
 //    }
     
+    //testGain.prepare(spec);
+    //testGain.setRampDurationSeconds(0.05);
+    
     ParallelConvs.prepare(spec);
+    
+    //outGain1.prepare(spec);
     
     for(auto& buffer: audioSplitBuffers)
     {
         buffer.setSize(spec.numChannels, samplesPerBlock);
     }
+    
+    
 }
     
 void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
@@ -423,8 +430,6 @@ void PipeDreamAudioProcessor::splitAudio(const juce::AudioBuffer<float> &inputBu
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     
-    //auto g = apvts.getRawParameterValue("Pitch_Sel_1");
-    //std::cout << g->load() <<std::endl;
     
     juce::ScopedNoDenormals noDenormals;
     
@@ -442,7 +447,34 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     splitAudio(buffer);
     
-    ParallelConvs.process(conteky);
+//    outGainParams[0].setGainDecibels(outGain1->get());
+//    outGainParams[1].setGainDecibels(outGain2->get());
+//    outGainParams[2].setGainDecibels(outGain3->get());
+//    outGainParams[3].setGainDecibels(outGain4->get());
+//    outGainParams[4].setGainDecibels(outGain5->get());
+    
+    
+    outGainParams[0] = outGain1->get();
+    outGainParams[1] = outGain2->get();
+    outGainParams[2] = outGain3->get();
+    outGainParams[3] = outGain4->get();
+    outGainParams[4] = outGain5->get();
+    
+    //outGainParams
+    
+    
+    auto gainTest = outGain1->get();
+    
+    //testGain.setGainDecibels(gainTest);
+    
+    
+    ParallelConvs.process(conteky, outGainParams);//, testGain);
+    
+    
+    
+    //std::cout << gain1 <<std::endl;
+    //applyGain(buffer, outGains[0]);
+    
     
     //auto Blocky = juce::dsp::AudioBlock<float>(audioSplitBuffers[0]);
     //auto conteky = juce::dsp::ProcessContextReplacing<float>(Blocky);
