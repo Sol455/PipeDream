@@ -25,7 +25,10 @@ enum Names {
     Gain_Out_2,
     Gain_Out_3,
     Gain_Out_4,
-    Gain_Out_5
+    Gain_Out_5,
+    
+    Chord_Sel,
+    Root_Sel
     
 };
 inline const std::map<Names, juce::String>& GetParams()
@@ -45,6 +48,8 @@ inline const std::map<Names, juce::String>& GetParams()
         {Gain_Out_4, "Gain_Out_4"},
         {Gain_Out_5, "Gain_Out_5"},
         
+        {Chord_Sel, "Chord_Sel"},
+        {Root_Sel, "Root_Sel"},
         
     };
     

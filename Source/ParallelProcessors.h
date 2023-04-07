@@ -33,7 +33,6 @@ public:
     template <class ProcessContext>
     void process (const ProcessContext& context, std::array<float, 5> outGainParams)
     {
-        //gainTest = outGainParams[0]; //-24;//outGain1->get();
         
         for (int i = 0; i < 5; i ++) {
             outGains[i].setGainDecibels(outGainParams[i]);

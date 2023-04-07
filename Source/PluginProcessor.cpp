@@ -42,6 +42,12 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
            jassert(param !=nullptr);
        };
     
+    auto choiceHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
+    {
+        param = dynamic_cast<juce::AudioParameterChoice*>(apvts.getParameter(params.at(paramName)));
+        jassert(param !=nullptr);
+    };
+    
     IntHelper(pitchsel1, Names::Pitch_Sel_1);
     IntHelper(pitchsel2, Names::Pitch_Sel_2);
     IntHelper(pitchsel3, Names::Pitch_Sel_3);
@@ -53,7 +59,9 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     floatHelper(outGain3, Names::Gain_Out_3);
     floatHelper(outGain4, Names::Gain_Out_4);
     floatHelper(outGain5, Names::Gain_Out_5);
-
+    
+    choiceHelper(ChordSel, Names::Chord_Sel);
+    IntHelper(rootSel, Names::Root_Sel);
 
 }
 
@@ -105,30 +113,51 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_1),1},
                                                             params.at(Names::Pitch_Sel_1),
                                                             -12,
-                                                            12,
+                                                            24,
                                                              0));
         
         layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_2),1},
                                                             params.at(Names::Pitch_Sel_2),
                                                             -12,
-                                                            12,
+                                                            24,
                                                              0));
         
         layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_3),1},
                                                             params.at(Names::Pitch_Sel_3),
                                                             -12,
-                                                            12,
+                                                            24,
                                                              0));
     
         layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_4),1},
                                                             params.at(Names::Pitch_Sel_4),
                                                             -12,
-                                                            12,
+                                                            24,
                                                              0));
         
         layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Pitch_Sel_5),1},
                                                             params.at(Names::Pitch_Sel_5),
                                                             -12,
+                                                            24,
+                                                             0));
+        
+        //chords
+        
+        auto choices = std::vector<double>{1,1.5,2,3,4,5,6,7,8,10,15,20,50,100};
+
+        juce::StringArray sa;
+        for (auto choice : choices)
+        {
+            sa.add(juce::String(choice, 1));
+        }
+
+        layout.add(std::make_unique<AudioParameterChoice>(ParameterID {params.at(Names::Chord_Sel), 1},
+                                                          params.at(Names::Chord_Sel),
+                                                          sa,
+                                                          3 ));
+        
+        layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Root_Sel),1},
+                                                            params.at(Names::Root_Sel),
+                                                            0,
                                                             12,
                                                              0));
 
@@ -209,24 +238,12 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.numChannels = getTotalNumOutputChannels();
 
     readIRFromFile(2, 0);
-    
-//    for (int i = 0; i < 5; i ++) {
-//        outGains[i].prepare(spec);
-//        //outGains[i].setRampDurationSeconds(0.05);
-//    }
-    
-    //testGain.prepare(spec);
-    //testGain.setRampDurationSeconds(0.05);
-    
     ParallelConvs.prepare(spec);
-    
-    //outGain1.prepare(spec);
     
     for(auto& buffer: audioSplitBuffers)
     {
         buffer.setSize(spec.numChannels, samplesPerBlock);
     }
-    
     
 }
     
@@ -238,7 +255,6 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
     {
         juce::AudioFormatManager manager;
         manager.registerBasicFormats();
-        //std::unique_ptr<juce::AudioFormatReader> reader { manager.createReaderFor (std::move (currentIR)) };
         juce::AudioFormatReader *reader { manager.createReaderFor (std::move (currentIR)) };
 
         if (reader == nullptr)
@@ -247,6 +263,7 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
             return;
         }
         
+        //trim buffer below 1sec
         repitchBuffer(reader, 0, -12);
         repitchBuffer(reader, 1, -11);
         repitchBuffer(reader, 2, -10);
@@ -268,10 +285,22 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
         repitchBuffer(reader, 18, 6);
         repitchBuffer(reader, 19, 7);
         repitchBuffer(reader, 20, 8);
-        repitchBuffer(reader, 21, 8);
+        repitchBuffer(reader, 21, 9);
         repitchBuffer(reader, 22, 10);
         repitchBuffer(reader, 23, 11);
         repitchBuffer(reader, 24, 12);
+        repitchBuffer(reader, 25, 13);
+        repitchBuffer(reader, 26, 14);
+        repitchBuffer(reader, 27, 15);
+        repitchBuffer(reader, 28, 16);
+        repitchBuffer(reader, 29, 17);
+        repitchBuffer(reader, 30, 18);
+        repitchBuffer(reader, 31, 19);
+        repitchBuffer(reader, 32, 20);
+        repitchBuffer(reader, 33, 21);
+        repitchBuffer(reader, 34, 22);
+        repitchBuffer(reader, 35, 23);
+        repitchBuffer(reader, 36, 24);
 //        for (int i = 1; i < 12; i ++) {
 //            repitchBuffer(reader, i, -(12 - i));
 //       }
@@ -292,17 +321,17 @@ void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int
     semitoneToPhase = pow(2.0, semitoneIn/12.0);
     
     juce::AudioSampleBuffer temp;
-    //clear buffers
+    //1. clear buffers
     bufferStore.BufBankReadP(bufferNum).clear();
     temp.clear();
     
     double ratio =  semitoneToPhase;//dOutSampleRate; reader->sampleRate / dOutSampleRate;
 
-    //set buffer Sizes
+    //2. set buffer Sizes
     temp.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
     bufferStore.SetBufferSize(bufferNum, static_cast<int> (reader->numChannels), (static_cast<int>(reader->lengthInSamples)/ ratio));
     
-    //read file into tempory buffer
+    //3. read file into tempory buffer
     reader->read(&temp, 0, static_cast<int>(reader->lengthInSamples), 0, true, true);
     
     juce::LagrangeInterpolator interpolator;
@@ -367,14 +396,6 @@ void PipeDreamAudioProcessor::updateCurrentIRs() {
         });
     }
     
-    
-    //    for (auto& convInstance : ParallelConvs.processors)
-    //            *convInstance.loadImpulseResponse (std::move (buf.buffer),
-    //                                                buf.sampleRate,
-    //                                                juce::dsp::Convolution::Stereo::yes,
-    //                                                juce::dsp::Convolution::Trim::yes,
-    //                                                juce::dsp::Convolution::Normalise::yes);
-    //}
 }
 
 void PipeDreamAudioProcessor::setCurrentIRs() {
@@ -440,55 +461,19 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     juce::dsp::AudioBlock<float> block {buffer};
     auto conteky = juce::dsp::ProcessContextReplacing<float>(block);
-    //juce::dsp::AudioBlock<float> block2 {buffer};
-    //juce::dsp::AudioBlock<float> block3 {buffer};
-    
-    updateCurrentIRs();
 
+    updateCurrentIRs();
     splitAudio(buffer);
-    
-//    outGainParams[0].setGainDecibels(outGain1->get());
-//    outGainParams[1].setGainDecibels(outGain2->get());
-//    outGainParams[2].setGainDecibels(outGain3->get());
-//    outGainParams[3].setGainDecibels(outGain4->get());
-//    outGainParams[4].setGainDecibels(outGain5->get());
-    
     
     outGainParams[0] = outGain1->get();
     outGainParams[1] = outGain2->get();
     outGainParams[2] = outGain3->get();
     outGainParams[3] = outGain4->get();
     outGainParams[4] = outGain5->get();
-    
-    //outGainParams
-    
-    
-    auto gainTest = outGain1->get();
-    
-    //testGain.setGainDecibels(gainTest);
-    
-    
-    ParallelConvs.process(conteky, outGainParams);//, testGain);
-    
-    
-    
-    //std::cout << gain1 <<std::endl;
-    //applyGain(buffer, outGains[0]);
-    
-    
-    //auto Blocky = juce::dsp::AudioBlock<float>(audioSplitBuffers[0]);
-    //auto conteky = juce::dsp::ProcessContextReplacing<float>(Blocky);
-    
-    //for(int i =0; i < 1; i++) {
-        //convObjects[i].process(juce::dsp::ProcessContextReplacing<float>(block));
-        //convObjects[i].process(juce::dsp::ProcessContextReplacing<float>(block));
-        //convObjects[0].process(juce::dsp::ProcessContextReplacing<float>(block1));
-        //convObjects[0].process(juce::dsp::ProcessContextReplacing<float>(block));
 
-        //convObjects[1].process(juce::dsp::ProcessContextReplacing<float>(block2));
-        //convObjects[2].process(juce::dsp::ProcessContextReplacing<float>(block3));
-    //}
-   
+    ParallelConvs.process(conteky, outGainParams);
+    
+    
 
 //    // In case we have more outputs than inputs, this code clears any output
 //    // channels that didn't contain input data, (because these aren't

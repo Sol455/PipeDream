@@ -42,6 +42,9 @@ private:
     juce::Slider GainOut3Slider;
     juce::Slider GainOut4Slider;
     juce::Slider GainOut5Slider;
+    
+    juce::Slider ChordSelSlider;
+    juce::Slider RootSelSlider;
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel1Attachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel2Attachment;
@@ -54,6 +57,9 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> GainOut3Attachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> GainOut4Attachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> GainOut5Attachment;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> ChordSelAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> RootSelAttachment;
     
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;

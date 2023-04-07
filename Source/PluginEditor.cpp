@@ -54,6 +54,8 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     auto text_box_height = 50;
     auto text_box_width = 25;
     
+    //pitch
+    
     PitchSel1Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     PitchSel2Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     PitchSel3Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
@@ -66,6 +68,21 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     PitchSel4Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
     PitchSel5Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
     
+    PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_1", PitchSel1Slider);
+    PitchSel2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_2", PitchSel2Slider);
+    PitchSel3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_3", PitchSel3Slider);
+    PitchSel4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_4", PitchSel4Slider);
+    PitchSel5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_5", PitchSel5Slider);
+    
+    addAndMakeVisible(PitchSel1Slider);
+    addAndMakeVisible(PitchSel2Slider);
+    addAndMakeVisible(PitchSel3Slider);
+    addAndMakeVisible(PitchSel4Slider);
+    addAndMakeVisible(PitchSel5Slider);
+    
+    
+    //gain
+
     GainOut1Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     GainOut2Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     GainOut3Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
@@ -77,12 +94,12 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     GainOut3Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
     GainOut4Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
     GainOut5Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    
-    addAndMakeVisible(PitchSel1Slider);
-    addAndMakeVisible(PitchSel2Slider);
-    addAndMakeVisible(PitchSel3Slider);
-    addAndMakeVisible(PitchSel4Slider);
-    addAndMakeVisible(PitchSel5Slider);
+
+    GainOut1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_1", GainOut1Slider);
+    GainOut2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_2", GainOut2Slider);
+    GainOut3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_3", GainOut3Slider);
+    GainOut4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_4", GainOut4Slider);
+    GainOut5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_5", GainOut5Slider);
     
     addAndMakeVisible(GainOut1Slider);
     addAndMakeVisible(GainOut2Slider);
@@ -90,19 +107,22 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     addAndMakeVisible(GainOut4Slider);
     addAndMakeVisible(GainOut5Slider);
     
+   
     
-    PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_1", PitchSel1Slider);
-    PitchSel2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_2", PitchSel2Slider);
-    PitchSel3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_3", PitchSel3Slider);
-    PitchSel4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_4", PitchSel4Slider);
-    PitchSel5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_5", PitchSel5Slider);
+    //chords
     
+    ChordSelSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    RootSelSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     
-    GainOut1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_1", GainOut1Slider);
-    GainOut2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_2", GainOut2Slider);
-    GainOut3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_3", GainOut3Slider);
-    GainOut4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_4", GainOut4Slider);
-    GainOut5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_5", GainOut5Slider);
+    ChordSelSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    RootSelSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    
+    addAndMakeVisible(ChordSelSlider);
+    addAndMakeVisible(RootSelSlider);
+    
+    ChordSelAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Chord_Sel", ChordSelSlider);
+    RootSelAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Root_Sel", RootSelSlider);
+    
 
 
     setSize (650, 240);
@@ -130,11 +150,11 @@ void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
     juce::Rectangle<int> gainControlsR = gainControls.getBounds();
 
     g.setColour(juce::Colours::grey);
-    g.fillRect(pitchSelControlR);
+    g.drawRect(pitchSelControlR);
     g.setColour(juce::Colours::darkgrey);
-    g.fillRect(gainControlsR);
+    g.drawRect(gainControlsR);
     
-    g.setColour(juce::Colours::red);
+    g.setColour (juce::Colours::red);
     g.drawRect(filterControlsR);
     g.drawRect(chordControlsR);
     
@@ -212,6 +232,21 @@ void PipeDreamAudioProcessorEditor::resized()
    
     flexBoxgain.performLayout(gainBounds);
    
+    //chords flexbox
+    
+    auto chordBounds = chordControls.getBounds().reduced(10);
+
+    juce::FlexBox flexBoxChords;
+    flexBoxChords.flexDirection = juce::FlexBox::Direction::column;
+    flexBoxChords.flexWrap = juce::FlexBox::Wrap::noWrap;
+    
+    flexBoxChords.items.add(spacer);
+    flexBoxChords.items.add(juce::FlexItem(ChordSelSlider).withFlex(1.f));
+    flexBoxChords.items.add(spacer);
+    flexBoxChords.items.add(juce::FlexItem(RootSelSlider).withFlex(1.f));
+    flexBoxChords.items.add(spacer);
+    
+    flexBoxChords.performLayout(chordBounds);
     
     
 }

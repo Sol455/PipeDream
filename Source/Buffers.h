@@ -82,7 +82,7 @@ public:
 
 private:
     
-    BufferWithSampleRate bufferBank1[25] = {
+    BufferWithSampleRate bufferBank1[37] = {
     };
 
 };
