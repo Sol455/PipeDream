@@ -28,6 +28,19 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
+    
+    int chordArray[9][5] = {
+        {0, 0, 0, 0, 0}, // Mono
+        {0, 0, 0, 7, 7}, // 5th
+        {0, 0, 2, 2, 7}, // Sus2
+        {0, 0, 3, 3, 7}, // Minor
+        {0, 0, 4, 4, 7}, // Major
+        {0, 0, 5, 5, 7}, // sus4
+        {0, 4, 4, 7, 11}, // Maj7
+        {0, 3, 3, 7, 11}, // min7
+        {0, 0, 7, 9, 9} // 7sus
+    };
+    
     PipeDreamAudioProcessor& audioProcessor;
     juce::ValueTree& variableTree;
     

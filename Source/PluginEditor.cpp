@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "stdio.h"
 
 //==============================================================================
 PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProcessor& p)
@@ -48,6 +49,34 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
         });
     };
     
+    ChordSelSlider.onDragEnd = [this]()
+    {
+        //int currentChord = ChordSel->getCurrentChoiceName().getIntValue();
+        auto ChordSel = audioProcessor.apvts.getRawParameterValue("Chord_Sel");
+        int currentChord = static_cast<int>(ChordSel->load());
+
+        
+        audioProcessor.apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
+        audioProcessor.apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_1")->convertTo0to1(chordArray[currentChord][0]));
+        audioProcessor.apvts.getParameter("Pitch_Sel_1")->endChangeGesture();
+        
+        audioProcessor.apvts.getParameter("Pitch_Sel_2")->beginChangeGesture();
+        audioProcessor.apvts.getParameter("Pitch_Sel_2")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_2")->convertTo0to1(chordArray[currentChord][1]));
+        audioProcessor.apvts.getParameter("Pitch_Sel_2")->endChangeGesture();
+        
+        audioProcessor.apvts.getParameter("Pitch_Sel_3")->beginChangeGesture();
+        audioProcessor.apvts.getParameter("Pitch_Sel_3")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_3")->convertTo0to1(chordArray[currentChord][2]));
+        audioProcessor.apvts.getParameter("Pitch_Sel_3")->endChangeGesture();
+        
+        audioProcessor.apvts.getParameter("Pitch_Sel_4")->beginChangeGesture();
+        audioProcessor.apvts.getParameter("Pitch_Sel_4")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_4")->convertTo0to1(chordArray[currentChord][3]));
+        audioProcessor.apvts.getParameter("Pitch_Sel_4")->endChangeGesture();
+        
+        audioProcessor.apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
+        audioProcessor.apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_5")->convertTo0to1(chordArray[currentChord][4]));
+        audioProcessor.apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
+
+    };
     
     addAndMakeVisible(irName);
     

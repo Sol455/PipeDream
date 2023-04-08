@@ -65,6 +65,7 @@ public:
     void splitAudio(const juce::AudioBuffer<float> &inputBuffer);
     void updateCurrentIRs();
     void setCurrentIRs();
+    void chordProcess();
 
     
     juce::AudioProcessorValueTreeState apvts;
@@ -113,6 +114,8 @@ public:
     
 
     
+
+    
 private:
     //==============================================================================
     
@@ -129,13 +132,19 @@ private:
     juce::AudioParameterFloat* outGain5 {nullptr};
     
     juce::AudioParameterChoice* ChordSel {nullptr};
-    juce::AudioParameterInt* rootSel {nullptr};
+    juce::AudioParameterChoice* rootSel {nullptr};
 
     
     std::array<juce::dsp::Gain<float>, 5> outGains;
     
     
-    juce::dsp::Gain<float> testGain;
+    //juce::dsp::Gain<float> testGain;
+    
+    
+    //std::array<int>, 5, 9> chordArray;
+    
+
+    //"Mono","5th","Sus2","Minor","Maj","Sus4","Maj7","min7","7sus"
     
     
 

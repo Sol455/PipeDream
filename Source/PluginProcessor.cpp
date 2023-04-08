@@ -61,7 +61,7 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     floatHelper(outGain5, Names::Gain_Out_5);
     
     choiceHelper(ChordSel, Names::Chord_Sel);
-    IntHelper(rootSel, Names::Root_Sel);
+    choiceHelper(rootSel, Names::Root_Sel);
 
 }
 
@@ -142,24 +142,27 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         
         //chords
         
-        auto choices = std::vector<double>{1,1.5,2,3,4,5,6,7,8,10,15,20,50,100};
+        //auto choices = std::vector<double>{1,1.5,2,3,4,5,6,7,8,10,15,20,50,100};
+        //auto chords = std::array<juce::String, 9> {"Mono","5t","Sus2","Minor","Maj","Sus4","Maj7","min7","7sus"};
 
-        juce::StringArray sa;
-        for (auto choice : choices)
-        {
-            sa.add(juce::String(choice, 1));
-        }
+        juce::StringArray chords = {"Mono","5th","Sus2","Minor","Maj","Sus4","Maj7","min7","7sus"};
+        juce::StringArray roots = {"A","B","C","D","E","F","G","min7","7sus"};
+
+//       // juce::StringArray {} sa;
+//        for (auto chord : chords)
+//        {
+//            sa.add(juce::String(chord, 1));
+//        }
 
         layout.add(std::make_unique<AudioParameterChoice>(ParameterID {params.at(Names::Chord_Sel), 1},
                                                           params.at(Names::Chord_Sel),
-                                                          sa,
-                                                          3 ));
+                                                          chords,
+                                                          3));
         
-        layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID{params.at(Names::Root_Sel),1},
+        layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID{params.at(Names::Root_Sel),1},
                                                             params.at(Names::Root_Sel),
-                                                            0,
-                                                            12,
-                                                             0));
+                                                            roots,
+                                                            0));
 
         return layout;
 }
@@ -448,9 +451,23 @@ void PipeDreamAudioProcessor::splitAudio(const juce::AudioBuffer<float> &inputBu
     
 }
 
+void PipeDreamAudioProcessor::chordProcess() {
+//     int currentChord = ChordSel->getCurrentChoiceName().getIntValue();
+//    
+//
+//    
+//         apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
+//         apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(5.0);
+//         apvts.getParameter("Pitch_Sel_1")->endChangeGesture();
+
+
+}
+
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    
+//    auto chords = ChordSel->getCurrentChoiceName().getFloatValue(); //
+//    //ratio->getCurrentChoiceName().getFloatValue());
+//    std::cout << chords;
     
     juce::ScopedNoDenormals noDenormals;
     
@@ -461,7 +478,7 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     juce::dsp::AudioBlock<float> block {buffer};
     auto conteky = juce::dsp::ProcessContextReplacing<float>(block);
-
+    
     updateCurrentIRs();
     splitAudio(buffer);
     
@@ -472,6 +489,8 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     outGainParams[4] = outGain5->get();
 
     ParallelConvs.process(conteky, outGainParams);
+    
+
     
     
 
