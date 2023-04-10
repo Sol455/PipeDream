@@ -112,8 +112,8 @@ public:
     //gain
     std::array<float, 5> outGainParams;
     
+    juce::dsp::DryWetMixer<float> dry_wet_mixer;
 
-    
 
     
 private:
@@ -135,6 +135,8 @@ private:
     juce::AudioParameterChoice* rootSel {nullptr};
     
     juce::AudioParameterBool* ChordHold {nullptr};
+    
+    juce::AudioParameterFloat* DryWet {nullptr};
 
     
     std::array<juce::dsp::Gain<float>, 5> outGains;

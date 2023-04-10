@@ -65,6 +65,11 @@ private:
     
     juce::Slider ChordSelSlider;
     juce::Slider RootSelSlider;
+    
+    juce::Slider DryWetSlider;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> DryWetAttachment;
+
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel1Attachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> PitchSel2Attachment;

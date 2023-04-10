@@ -66,6 +66,8 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     floatHelper(outGain4, Names::Gain_Out_4);
     floatHelper(outGain5, Names::Gain_Out_5);
     
+    floatHelper(DryWet, Names::Dry_Wet);
+    
     choiceHelper(ChordSel, Names::Chord_Sel);
     choiceHelper(rootSel, Names::Root_Sel);
     
@@ -149,18 +151,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout
                                                              0));
         
         //chords
-        
-        //auto choices = std::vector<double>{1,1.5,2,3,4,5,6,7,8,10,15,20,50,100};
-        //auto chords = std::array<juce::String, 9> {"Mono","5t","Sus2","Minor","Maj","Sus4","Maj7","min7","7sus"};
+    
 
         juce::StringArray chords = {"Mono","5th","Sus2","Minor","Maj","Sus4","Maj7","min7","7sus"};
         juce::StringArray roots = {"C","C#","D","D#","E","F","F#","G","G#","A", "A#",       "B","C","C#","D","D#","E","F","F#","G","G#","A", "A#", "B","C"};
 
-//       // juce::StringArray {} sa;
-//        for (auto chord : chords)
-//        {
-//            sa.add(juce::String(chord, 1));
-//        }
 
         layout.add(std::make_unique<AudioParameterChoice>(ParameterID {params.at(Names::Chord_Sel), 1},
                                                           params.at(Names::Chord_Sel),
@@ -176,6 +171,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{params.at(Names::Chord_Hold),1},
                                                             params.at(Names::Chord_Hold),
                                                             false));
+        
+        //Dry/ wet
+        
+        auto dryWetRange = NormalisableRange<float>(0.f, 1.f, 0.01);
+
+        layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Dry_Wet), 1},
+                                                        params.at(Names::Dry_Wet),
+                                                        dryWetRange,
+                                                        0.5 ));
+        
 
         return layout;
 }
@@ -253,7 +258,9 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.maximumBlockSize = samplesPerBlock;
     spec.sampleRate = sampleRate;
     spec.numChannels = getTotalNumOutputChannels();
-
+    
+    
+    dry_wet_mixer.prepare(spec);
     readIRFromFile(2, 0);
     ParallelConvs.prepare(spec);
     
@@ -487,11 +494,17 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    auto dry_wet_ratio = DryWet->get();
     
     setCurrentIRs();
 
     juce::dsp::AudioBlock<float> block {buffer};
     auto conteky = juce::dsp::ProcessContextReplacing<float>(block);
+
+    
+    dry_wet_mixer.pushDrySamples(block);
+    dry_wet_mixer.setWetMixProportion(dry_wet_ratio);
+    
     
     updateCurrentIRs();
     splitAudio(buffer);
@@ -503,6 +516,8 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     outGainParams[4] = outGain5->get();
 
     ParallelConvs.process(conteky, outGainParams);
+    
+    dry_wet_mixer.mixWetSamples(block);
     
 
     

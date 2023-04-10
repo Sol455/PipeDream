@@ -184,6 +184,20 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     addAndMakeVisible(chordHoldButton);
     //add menu item
     
+    //dry wet slider
+    
+    DryWetSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    DryWetSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    
+    
+    
+    DryWetAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Dry_Wet", DryWetSlider);
+ 
+    
+    addAndMakeVisible(DryWetSlider);
+    
+    
+    
     setSize (650, 240);
     
 
@@ -365,6 +379,21 @@ void PipeDreamAudioProcessorEditor::resized()
     flexBoxChords.items.add(spacer);
     
     flexBoxChords.performLayout(chordBounds);
+    
+    //filter flexbox
+    
+    auto filterBounds = filterControls.getBounds().reduced(10);
+
+    //buttonBounds.getX() + buttonBounds.getX() / 2, buttonBounds.getY(), 50, 50)
+    juce::FlexBox flexBoxFilter;
+    flexBoxFilter.flexDirection = juce::FlexBox::Direction::column;
+    flexBoxFilter.flexWrap = juce::FlexBox::Wrap::noWrap;
+    
+    flexBoxFilter.items.add(spacer);
+    flexBoxFilter.items.add(juce::FlexItem(DryWetSlider).withFlex(1.f));
+    flexBoxFilter.items.add(spacer);
+    flexBoxFilter.performLayout(filterBounds);
+    
     
     
 }
