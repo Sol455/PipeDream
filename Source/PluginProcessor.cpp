@@ -48,6 +48,12 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
         jassert(param !=nullptr);
     };
     
+    auto boolHelper = [&apvts = this->apvts, &params](auto& param, const auto& paramName)
+    {
+        param = dynamic_cast<juce::AudioParameterBool*>(apvts.getParameter(params.at(paramName)));
+        jassert(param !=nullptr);
+    };
+    
     IntHelper(pitchsel1, Names::Pitch_Sel_1);
     IntHelper(pitchsel2, Names::Pitch_Sel_2);
     IntHelper(pitchsel3, Names::Pitch_Sel_3);
@@ -62,6 +68,8 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     
     choiceHelper(ChordSel, Names::Chord_Sel);
     choiceHelper(rootSel, Names::Root_Sel);
+    
+    boolHelper(ChordHold, Names::Chord_Hold);
 
 }
 
@@ -146,7 +154,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         //auto chords = std::array<juce::String, 9> {"Mono","5t","Sus2","Minor","Maj","Sus4","Maj7","min7","7sus"};
 
         juce::StringArray chords = {"Mono","5th","Sus2","Minor","Maj","Sus4","Maj7","min7","7sus"};
-        juce::StringArray roots = {"A","B","C","D","E","F","G","min7","7sus"};
+        juce::StringArray roots = {"C","C#","D","D#","E","F","F#","G","G#","A", "A#",       "B","C","C#","D","D#","E","F","F#","G","G#","A", "A#", "B","C"};
 
 //       // juce::StringArray {} sa;
 //        for (auto chord : chords)
@@ -163,6 +171,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout
                                                             params.at(Names::Root_Sel),
                                                             roots,
                                                             0));
+        
+        
+        layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{params.at(Names::Chord_Hold),1},
+                                                            params.at(Names::Chord_Hold),
+                                                            false));
 
         return layout;
 }
@@ -171,6 +184,7 @@ void PipeDreamAudioProcessor::parameterChanged(const juce::String &parameterID, 
 {
     
 }
+
 //==============================================================================
 const juce::String PipeDreamAudioProcessor::getName() const
 {

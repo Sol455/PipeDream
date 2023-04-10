@@ -27,6 +27,8 @@ public:
         
         for (int i = 0; i < 5; i ++) {
             outGains[i].prepare(spec);
+            outGains[i].setRampDurationSeconds(0.05);
+            
         }
     }
 

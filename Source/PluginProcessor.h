@@ -133,6 +133,8 @@ private:
     
     juce::AudioParameterChoice* ChordSel {nullptr};
     juce::AudioParameterChoice* rootSel {nullptr};
+    
+    juce::AudioParameterBool* ChordHold {nullptr};
 
     
     std::array<juce::dsp::Gain<float>, 5> outGains;

@@ -24,6 +24,8 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    void computeChords();
+    void computeHeldChords();
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -40,6 +42,11 @@ private:
         {0, 3, 3, 7, 11}, // min7
         {0, 0, 7, 9, 9} // 7sus
     };
+    
+    std::array<int, 5> HeldChordValues;
+    
+   
+    
     
     PipeDreamAudioProcessor& audioProcessor;
     juce::ValueTree& variableTree;
@@ -86,6 +93,14 @@ private:
     
 //    juce::Identifier FilePath1;
 //    juce::Identifier Root;
+    
+    
+    //button attachment
+    
+    juce::TextButton chordHoldButton {"Hold"};
+
+        
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> ChordHoldAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PipeDreamAudioProcessorEditor)
 };
