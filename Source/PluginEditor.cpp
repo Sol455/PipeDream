@@ -60,10 +60,8 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
             
         if (chordHoldButton.getToggleState() == 1) {
             computeHeldChords();
-            std::cout << "High";
         } else  if (chordHoldButton.getToggleState() == 0) {
             computeChords();
-            std::cout << "Low";
 
         }
     };
@@ -144,13 +142,10 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
 
 
     //lock button
-    
-//    
-//    ChordHoldAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "Chord_Hold", chordHoldButton);
+
     
     ChordHoldAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "Chord_Hold", chordHoldButton);
-    
-    //chordHoldButton.changeWidthToFitText();
+
     
     chordHoldButton.setClickingTogglesState(true);
 
@@ -159,8 +154,6 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     chordHoldButton.onClick  = [&]() {
         const auto buttonMessage = chordHoldButton.getToggleState() ? "Held" : "Hold";
         chordHoldButton.setButtonText(buttonMessage);
-        std::cout << chordHoldButton.getToggleState();
-        
         
             auto currentPitch1 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_1");
             int pitch1 = static_cast<int>(currentPitch1->load());
@@ -279,11 +272,11 @@ void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
     juce::Rectangle<int> gainControlsR = gainControls.getBounds();
 
     g.setColour(juce::Colours::grey);
-    g.drawRect(pitchSelControlR);
     g.setColour(juce::Colours::darkgrey);
+    g.drawRect(pitchSelControlR);
     g.drawRect(gainControlsR);
     
-    g.setColour (juce::Colours::red);
+    //g.setColour (juce::Colours::red);
     g.drawRect(filterControlsR);
     g.drawRect(chordControlsR);
     

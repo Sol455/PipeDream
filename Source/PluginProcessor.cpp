@@ -325,8 +325,9 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
         repitchBuffer(reader, 34, 22);
         repitchBuffer(reader, 35, 23);
         repitchBuffer(reader, 36, 24);
-//        for (int i = 1; i < 12; i ++) {
-//            repitchBuffer(reader, i, -(12 - i));
+        
+//        for (int i = 0; i < 12; i ++) {
+//            repitchBuffer(reader, i, (-12 + i));
 //       }
 //
 //        for (int i = 12; i <= 24; i++) {
@@ -335,6 +336,10 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
         
 //            repitchBuffer(reader, 4, 100000, -2);
 //            repitchBuffer(reader, 5, 200000, 3);
+        
+        for (int i = 0; i < 37; i++) {
+            normaliseAndTrim(i);
+        }
          delete reader;
     }
 }
@@ -370,6 +375,46 @@ void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int
     
      bufferStore.SetSampleRate(bufferNum, reader->sampleRate);
     
+}
+
+void PipeDreamAudioProcessor::normaliseAndTrim(int bufferNum) {
+      //normalize
+      
+//      std::cout << "Normalised" << bufferNum << "\n";
+//      std::cout << "Gain Applied" << 1.0f / (MaxMagnitude + 0.01) << "\n";
+//      std::cout << "max mag" << MaxMagnitude << "\n";
+    
+      //Trim
+        
+        int numSamples = bufferStore.getSamples(bufferNum);
+        //int blockSize = static_cast<int>(bufferStore.GetSampleRate(bufferNum) / 100);
+        int blockSize = static_cast<int>(std::floor(this->getSampleRate()) / 100);
+    
+        std::cout << "\n\nblock size" << blockSize;
+        int startBlockNum = 0;
+        int endBlockNum = numSamples / blockSize;
+        std::cout << "\nOrigional Length:" << numSamples;
+
+        float localMaxMagnitude = 0.0f;
+        while ((endBlockNum - 1) * blockSize > 0) {
+            --endBlockNum;
+            localMaxMagnitude = bufferStore.BufBankReadP(bufferNum).getMagnitude(endBlockNum * blockSize, blockSize);
+            // find the time to decay by 60 dB (T60)
+            if (localMaxMagnitude > 0.001) {
+                break;
+            }
+        }
+        
+    int trimmedNumSamples = endBlockNum * blockSize - 1;
+    std::cout << "\ntrimmed length :" << trimmedNumSamples;
+    int numChannels =  bufferStore.getChannels(bufferNum);
+    bufferStore.SetInfo1(bufferNum, numChannels, trimmedNumSamples);
+    
+    
+    //normalize
+    float MaxMagnitude = bufferStore.BufBankReadP(bufferNum).getMagnitude(0, bufferStore.getSamples(bufferNum));
+    bufferStore.BufBankReadP(bufferNum).applyGain(1.0f / (MaxMagnitude + 0.01));
+
 }
 
 void PipeDreamAudioProcessor::releaseResources()

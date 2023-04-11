@@ -54,6 +54,12 @@ public:
             //return bufferBank1[bufID];
     }
     
+    void SetSizeTrim (int buffernum, int numberofChannels, int numberofSamples)
+    {
+            bufferBank1[buffernum].buffer.setSize(numberofChannels, numberofSamples, true, false, false);
+            //return bufferBank1[bufID];
+    }
+    
     void SetSampleRate (int bufID, double sampleRate)
     {
         bufferBank1[bufID].sampleRate = sampleRate;
