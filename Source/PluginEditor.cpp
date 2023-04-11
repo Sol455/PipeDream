@@ -196,9 +196,6 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     
     DecaySlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     DecaySlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    
-    
-    
     DecayAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Decay_Time", DecaySlider);
  
     
@@ -206,13 +203,64 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     
     
     DecaySlider.onDragEnd = [this]() {
+        updateDecayTimes();
         
-        for (int i = 0; i < 37; i++) {
-            audioProcessor.setDecay(i);
-//            audioProcessor.setDecay(10);
-//            audioProcessor.setDecay(9);
-        }
-        audioProcessor.setCurrentIRs();
+//        for (int i = 0; i < 37; i++) {
+//            audioProcessor.setDecay(i);
+////            audioProcessor.setDecay(10);
+////            audioProcessor.setDecay(9);
+//        }
+        
+    };
+    
+    PitchSel1Slider.onDragEnd = [this]() {
+        updateDecayTimes();
+
+        //audioProcessor.setCurrentIRs();
+    };
+    PitchSel2Slider.onDragEnd = [this]() {
+        updateDecayTimes();
+//audioProcessor.setCurrentIRs();
+    };
+    PitchSel3Slider.onDragEnd = [this]() {
+        updateDecayTimes();
+//audioProcessor.setCurrentIRs();
+    };
+    PitchSel4Slider.onDragEnd = [this]() {
+        //audioProcessor.setCurrentIRs();
+        updateDecayTimes();
+
+    };
+    PitchSel5Slider.onDragEnd = [this]() {
+        //audioProcessor.setCurrentIRs();
+        updateDecayTimes();
+    };
+    
+    
+    setSize (650, 240);
+    
+
+}
+
+void PipeDreamAudioProcessorEditor::updateDecayTimes() {
+    
+    auto PitchSel1 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_1");
+    int Pitch1 = static_cast<int>(PitchSel1->load());
+    auto PitchSel2 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_2");
+    int Pitch2 = static_cast<int>(PitchSel2->load());
+    auto PitchSel3 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_3");
+    int Pitch3 = static_cast<int>(PitchSel3->load());
+    auto PitchSel4 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_4");
+    int Pitch4 = static_cast<int>(PitchSel4->load());
+    auto PitchSel5 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_5");
+    int Pitch5 = static_cast<int>(PitchSel5->load());
+    
+    audioProcessor.setDecay(Pitch1 + 12);
+    audioProcessor.setDecay(Pitch2 + 12);
+    audioProcessor.setDecay(Pitch3 + 12);
+    audioProcessor.setDecay(Pitch4 + 12);
+    audioProcessor.setDecay(Pitch5 + 12);
+    audioProcessor.setCurrentIRs();
 //
 
 //        if (chordHoldButton.getToggleState() == 1) {
@@ -221,28 +269,8 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
 //            computeChords();
 //
 //        }
-    };
-    
-    PitchSel1Slider.onDragEnd = [this]() {
-        audioProcessor.setCurrentIRs();
-    };
-    PitchSel2Slider.onDragEnd = [this]() {
-        audioProcessor.setCurrentIRs();
-    };
-    PitchSel3Slider.onDragEnd = [this]() {
-        audioProcessor.setCurrentIRs();
-    };
-    PitchSel4Slider.onDragEnd = [this]() {
-        audioProcessor.setCurrentIRs();
-    };
-    PitchSel5Slider.onDragEnd = [this]() {
-        audioProcessor.setCurrentIRs();
-    };
     
     
-    setSize (650, 240);
-    
-
 }
 
 PipeDreamAudioProcessorEditor::~PipeDreamAudioProcessorEditor()

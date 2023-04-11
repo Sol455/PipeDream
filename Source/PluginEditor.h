@@ -26,6 +26,7 @@ public:
     void resized() override;
     void computeChords();
     void computeHeldChords();
+    void updateDecayTimes();
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -44,6 +45,7 @@ private:
     };
     
     std::array<int, 5> HeldChordValues;
+    //std::array<int, 5> currentChordValues;
     
    
     

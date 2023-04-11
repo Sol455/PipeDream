@@ -555,6 +555,9 @@ void PipeDreamAudioProcessor::setDecay(int bufferNum) {
 
 
       double stretchRatio = referenceBuffers.getSamples(bufferNum) / static_cast<double>(decaySample);
+    
+    
+      juce::AudioBuffer<float> temp;
 
       int numChannels = referenceBuffers.getChannels(bufferNum);
       soundtouch.setTempo(stretchRatio);
