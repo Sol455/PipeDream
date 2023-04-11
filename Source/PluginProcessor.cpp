@@ -561,19 +561,22 @@ void PipeDreamAudioProcessor::setDecay(int bufferNum) {
 
       int numChannels = referenceBuffers.getChannels(bufferNum);
       soundtouch.setTempo(stretchRatio);
-      //std::cout << "\nStretch Ratio:" << stretchRatio;
-    
-      //bufferStore.BufBankReadP(bufferNum).setSize(numChannels, decaySample, false, true, false);
-      bufferStore.SetBufferSizeStretch(bufferNum, numChannels, decaySample);
+
+      temp.setSize(numChannels, decaySample, false, true, false);
+
+      //bufferStore.SetBufferSizeStretch(bufferNum, numChannels, decaySample);
     
       for (int channel = 0; channel < numChannels; ++channel) {
         soundtouch.putSamples(referenceBuffers.BufBankBufferReadP1(bufferNum, channel),
                               referenceBuffers.getSamples(bufferNum));
           
-        soundtouch.receiveSamples(bufferStore.BufBankBufferWriteP1(bufferNum, channel),
+        soundtouch.receiveSamples(temp.getWritePointer(channel),
                                   decaySample);
         soundtouch.clear();
       }
+    
+    //bufferStore.BufBankBufferWriteP1(bufferNum, channel)
+    bufferStore.makecopy(bufferNum, temp);
 }
 
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
