@@ -54,6 +54,8 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
         if (chordHoldButton.getToggleState() == 0) {
             computeChords();
         }
+        audioProcessor.setCurrentIRs();
+
     };
     
     RootSelSlider.onDragEnd = [this]() {
@@ -64,6 +66,7 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
             computeChords();
 
         }
+        audioProcessor.setCurrentIRs();
     };
     
     addAndMakeVisible(irName);
@@ -189,6 +192,52 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     
     addAndMakeVisible(DryWetSlider);
     
+    //decay
+    
+    DecaySlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    DecaySlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    
+    
+    
+    DecayAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Decay_Time", DecaySlider);
+ 
+    
+    addAndMakeVisible(DecaySlider);
+    
+    
+    DecaySlider.onDragEnd = [this]() {
+        
+        for (int i = 0; i < 37; i++) {
+            audioProcessor.setDecay(i);
+//            audioProcessor.setDecay(10);
+//            audioProcessor.setDecay(9);
+        }
+        audioProcessor.setCurrentIRs();
+//
+
+//        if (chordHoldButton.getToggleState() == 1) {
+//            computeHeldChords();
+//        } else  if (chordHoldButton.getToggleState() == 0) {
+//            computeChords();
+//
+//        }
+    };
+    
+    PitchSel1Slider.onDragEnd = [this]() {
+        audioProcessor.setCurrentIRs();
+    };
+    PitchSel2Slider.onDragEnd = [this]() {
+        audioProcessor.setCurrentIRs();
+    };
+    PitchSel3Slider.onDragEnd = [this]() {
+        audioProcessor.setCurrentIRs();
+    };
+    PitchSel4Slider.onDragEnd = [this]() {
+        audioProcessor.setCurrentIRs();
+    };
+    PitchSel5Slider.onDragEnd = [this]() {
+        audioProcessor.setCurrentIRs();
+    };
     
     
     setSize (650, 240);
@@ -385,6 +434,9 @@ void PipeDreamAudioProcessorEditor::resized()
     flexBoxFilter.items.add(spacer);
     flexBoxFilter.items.add(juce::FlexItem(DryWetSlider).withFlex(1.f));
     flexBoxFilter.items.add(spacer);
+    flexBoxFilter.items.add(juce::FlexItem(DecaySlider).withFlex(1.f));
+    flexBoxFilter.items.add(spacer);
+    
     flexBoxFilter.performLayout(filterBounds);
     
     

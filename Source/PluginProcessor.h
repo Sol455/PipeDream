@@ -14,6 +14,8 @@
 #include "Buffers.h"
 #include "Params.h"
 #include "ParallelProcessors.h"
+#include "../SoundTouch/ea_soundtouch/ea_soundtouch.h"
+//#include "ea_soundtouch.h"
 
 //==============================================================================
 /**
@@ -67,6 +69,7 @@ public:
     void updateCurrentIRs();
     void setCurrentIRs();
     void chordProcess();
+    void setDecay(int bufferNum);
 
     
     juce::AudioProcessorValueTreeState apvts;
@@ -95,6 +98,7 @@ public:
     juce::String FilePath = getPathtoIRFolder();
 
     BufferStore bufferStore;
+    BufferStore referenceBuffers;
     
     juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
     
@@ -138,10 +142,12 @@ private:
     juce::AudioParameterBool* ChordHold {nullptr};
     
     juce::AudioParameterFloat* DryWet {nullptr};
+    juce::AudioParameterFloat* DecayTime {nullptr};
 
     
     std::array<juce::dsp::Gain<float>, 5> outGains;
     
+    soundtouch::SoundTouch soundtouch;
     
     //juce::dsp::Gain<float> testGain;
     

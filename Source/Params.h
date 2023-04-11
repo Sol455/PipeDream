@@ -32,7 +32,10 @@ enum Names {
     
     Chord_Hold,
     
-    Dry_Wet
+    Dry_Wet,
+    Decay_Time
+    
+    
     
 };
 inline const std::map<Names, juce::String>& GetParams()
@@ -56,6 +59,10 @@ inline const std::map<Names, juce::String>& GetParams()
         {Root_Sel, "Root_Sel"},
         {Chord_Hold, "Chord_Hold"},
         {Dry_Wet, "Dry_Wet"},
+        {Decay_Time, "Decay_Time"},
+        
+        
+        
         
     };
     
