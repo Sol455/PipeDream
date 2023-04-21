@@ -36,6 +36,10 @@ private:
     // access the processor object that created it.
     
     juce::CustomStyle customStyle;
+    
+    std::array<std::string, 5> IDArray;
+    
+
 
     int chordArray[9][5] = {
         {0, 0, 0, 0, 0}, // Mono
@@ -122,14 +126,13 @@ private:
     juce::Component topPanel;
     juce::Component sidePanel;
     
-    
-//    juce::Identifier FilePath1;
-//    juce::Identifier Root;
-    
-    
-    //button attachment
+    juce::Label TubeLengthLabel;
+    juce::Label GainLabel;
+    juce::Label TitleLabel;
+
     
     juce::TextButton chordHoldButton {"Hold"};
+    juce::TextButton LoadButton {"Load"};
 
         
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> ChordHoldAttachment;

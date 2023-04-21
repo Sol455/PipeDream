@@ -20,9 +20,9 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     //addAndMakeVisible(loadBtn);
-    loadBtn.setButtonText("Load IR");
+    //loadBtn.setButtonText("Load IR");
     DBG("variable tree in editor = " << static_cast<int>(variableTree.isValid()));
-    loadBtn.onClick = [this]()
+    LoadButton.onClick = [this]()
     {
         fileChooser = std::make_unique<juce::FileChooser>("Choose File",
                                                           audioProcessor.root,
@@ -54,12 +54,12 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     
     ChordSelSlider.onDragEnd = [this]()
     {
-        lockFlag = true;
+        //lockFlag = true;
         if (chordHoldButton.getToggleState() == 0) {
             computeChords();
         }
-        lockFlag = false;
-        audioProcessor.setCurrentIRs();
+        //lockFlag = false;
+        //audioProcessor.setCurrentIRs();
         //updateDecayTimes();
     };
     
@@ -164,6 +164,7 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     };
                                                                                     
     addAndMakeVisible(chordHoldButton);
+    addAndMakeVisible(LoadButton);
     //add menu item
     
     //dry wet slider    //decay
@@ -250,15 +251,13 @@ void PipeDreamAudioProcessorEditor::makeLabel(juce::Label &label,
 
 
 void PipeDreamAudioProcessorEditor::updateDecayTime(int voiceNumber) {
-    std::array<std::string, 5> IDArray;
-    
+
     IDArray =   {"Pitch_Sel_1",
                 "Pitch_Sel_2",
                 "Pitch_Sel_3",
                 "Pitch_Sel_4",
                 "Pitch_Sel_5"
     };
-    
     
     auto currentVoice = audioProcessor.apvts.getRawParameterValue(IDArray[voiceNumber]);
     int voice = static_cast<int>(currentVoice->load());
@@ -366,13 +365,15 @@ void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
     g.drawRect(pitchSelControlR);
     g.drawRect(gainControlsR);
     
-    g.setColour (juce::Colours::red);
+    //g.setColour (juce::Colours::red);
     g.drawRect(sidePanelR);
     g.drawRect(topPanelR);
     
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
     //g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    
+    
 }
 
 void PipeDreamAudioProcessorEditor::resized()
@@ -388,26 +389,54 @@ void PipeDreamAudioProcessorEditor::resized()
     const auto btnWidth = getWidth() * 0.15;
     const auto btnHeight = btnWidth * 0.5;
     
+    int spacerTop = 18;
+
+    
    
     loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
     irName.setBounds(loadBtn.getX() + loadBtn.getWidth(), btnY, btnWidth * 2, btnHeight);
     
-    topPanel.setBounds(bounds.removeFromTop(30));
+    topPanel.setBounds(bounds.removeFromTop(40));
     sidePanel.setBounds(bounds.removeFromRight(sidePaddingWidth * 2));
     pitchSelControls.setBounds(bounds.removeFromTop(bounds.getHeight()/2));
     gainControls.setBounds(bounds);
+    
+    
+    //main labels
+    
+    
+//
+//    TitleLabel.setText ("Pipe Dream", juce::dontSendNotification);
+//    TitleLabel.setFont (juce::Font (32.0f, juce::Font::bold));
+//    TitleLabel.setJustificationType (juce::Justification::left);
+//    addAndMakeVisible (TitleLabel);
+//    TitleLabel.setBounds(topPanel.getBounds());
 
+
+
+    TubeLengthLabel.setText ("Tube Length", juce::dontSendNotification);
+    TubeLengthLabel.setJustificationType (juce::Justification::centred);
+    addAndMakeVisible (TubeLengthLabel);
+    auto pitchTitleBounds = pitchSelControls.getBounds().removeFromTop(spacerTop);
+    TubeLengthLabel.setBounds(pitchTitleBounds.removeFromBottom(pitchTitleBounds.getHeight() - 5));
+
+
+    GainLabel.setText ("Gain", juce::dontSendNotification);
+    GainLabel.setJustificationType (juce::Justification::centred);
+    addAndMakeVisible (GainLabel);
+    auto GainTitleBounds = gainControls.getBounds().removeFromTop(spacerTop);
+    GainLabel.setBounds(GainTitleBounds.removeFromBottom(GainTitleBounds.getHeight() - 5));
+         
     //pitch flex box
-     auto pitchBounds = pitchSelControls.getBounds().reduced(15);
-     //auto pitchBounds = pitchSelControls.getBounds().reduced(15);
-
+     //auto pitchBounds = pitchSelControls.getBounds().reduced(10);
+     auto pitchBounds = pitchSelControls.getBounds().removeFromBottom(pitchSelControls.getHeight() - spacerTop).reduced(5);
 
      juce::FlexBox flexBoxpitch;
      flexBoxpitch.flexDirection = juce::FlexBox::Direction::row;
      flexBoxpitch.flexWrap = juce::FlexBox::Wrap::noWrap;
      
      auto spacer = juce::FlexItem().withWidth(2);
-     auto spacer2 = juce::FlexItem().withHeight(10);
+     //auto spacertop = juce::FlexItem().withWidth(10);
      
      flexBoxpitch.items.add(spacer);
      flexBoxpitch.items.add(juce::FlexItem(PitchSel1Slider).withFlex(1.f));
@@ -426,7 +455,9 @@ void PipeDreamAudioProcessorEditor::resized()
     
     //gain flexbox
     
-    auto gainBounds = gainControls.getBounds().reduced(15);
+    auto gainBounds = gainControls.getBounds().removeFromBottom(gainControls.getHeight() - spacerTop).reduced(5);
+    //auto gainBounds = gainControls.getBounds().reduced(10);
+
     //gainBounds = gainBounds.re
 
     juce::FlexBox flexBoxgain;
@@ -435,7 +466,7 @@ void PipeDreamAudioProcessorEditor::resized()
     
     //auto spacer = juce::FlexItem().withWidth(2);
     
-    flexBoxgain.items.add(spacer);
+    flexBoxpitch.items.add(spacer);
     flexBoxgain.items.add(juce::FlexItem(GainOut1Slider).withFlex(1.f));
     flexBoxgain.items.add(spacer);
     flexBoxgain.items.add(juce::FlexItem(GainOut2Slider).withFlex(1.f));
@@ -460,7 +491,11 @@ void PipeDreamAudioProcessorEditor::resized()
     //auto chordBoundZ = sidePanel.getBounds(); //.removeFromTop(sidePanel.getY()/2).reduced(10);
     auto chordBounds = sidePanel.getBounds().removeFromTop(sidePanel.getBounds().getHeight()/2).reduced(10);
     //auto buttonBounds = chordBounds.removeFromTop(30);
-    //chordHoldButton.setBounds(topPanel.getBounds().removeFromRight(50));
+    
+    auto buttonBounds = topPanel.getBounds().removeFromRight(sidePaddingWidth * 2);
+    
+    chordHoldButton.setBounds(buttonBounds.removeFromRight(buttonBounds.getWidth()/2).reduced(2));
+    LoadButton.setBounds(buttonBounds.reduced(2));
     //buttonBounds.getX() + buttonBounds.getX() / 2, buttonBounds.getY(), 50, 50)
     juce::FlexBox flexBoxChords;
     flexBoxChords.flexDirection = juce::FlexBox::Direction::row;
@@ -483,13 +518,12 @@ void PipeDreamAudioProcessorEditor::resized()
     
     //auto button2Bounds = filterBounds.removeFromTop(30);
     
-    //buttonBounds.getX() + buttonBounds.getX() / 2, buttonBounds.getY(), 50, 50)
+    //buttonBounds.getX() + buttonBounds.getX() / 2, buttonBounds.getY(), 50, 50);
     juce::FlexBox flexBoxFilter;
     flexBoxFilter.flexDirection = juce::FlexBox::Direction::row;
     flexBoxFilter.flexWrap = juce::FlexBox::Wrap::noWrap;
     
     flexBoxgain.items.add(spacer);
-
     flexBoxFilter.items.add(juce::FlexItem(LowPassSlider).withFlex(1.f));
     flexBoxgain.items.add(spacer);
     flexBoxFilter.items.add(juce::FlexItem(HighPassSlider).withFlex(1.f));

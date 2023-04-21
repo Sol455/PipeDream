@@ -517,86 +517,54 @@ void PipeDreamAudioProcessor::updateCurrentIRs() {
 
 void PipeDreamAudioProcessor::setCurrentIRs() {
     
-    std::array<int, 5> pitches;
+//    std::array<int, 5> pitches;
+//
+//    pitches = {
+//        pitchsel1->get() + 12,
+//        pitchsel2->get() + 12,
+//        pitchsel3->get() + 12,
+//        pitchsel4->get() + 12,
+//        pitchsel5->get() + 12
+//    };
+//
+//    for (int i = 0; i < 5; i++){
+//        bufferTransfers[i].set(BufferWithSampleRate {std::move (bufferStore.BufBankReadP(pitches[i])),
+//            bufferStore.GetSampleRate(pitches[i])});
+//    }
     
-    pitches = {
-        pitchsel1->get() + 12,
-        pitchsel2->get() + 12,
-        pitchsel3->get() + 12,
-        pitchsel4->get() + 12,
-        pitchsel5->get() + 12
-    };
-    
-    for (int i = 0; i < 5; i++){
-        bufferTransfers[i].set(BufferWithSampleRate {std::move (bufferStore.BufBankReadP(pitches[i])),
-            bufferStore.GetSampleRate(pitches[i])});
+    for (int i=0; i < 5; i ++) {
+        setCurrentIR(i);
     }
 
 }
 
 void PipeDreamAudioProcessor::setCurrentIR(int voiceNumber) {
     
-    std::array<int, 5> pitches;
     
-    pitches = {
-        pitchsel1->get() + 12,
-        pitchsel2->get() + 12,
-        pitchsel3->get() + 12,
-        pitchsel4->get() + 12,
-        pitchsel5->get() + 12
+    std::array<juce::AudioParameterInt*, 5> pitchIDArray;
+    
+    pitchIDArray = {
+        pitchsel1,
+        pitchsel2,
+        pitchsel3,
+        pitchsel4,
+        pitchsel5
     };
     
-    bufferTransfers[voiceNumber].set(BufferWithSampleRate {std::move (bufferStore.BufBankReadP(pitches[voiceNumber])),
-        bufferStore.GetSampleRate(pitches[voiceNumber])});
-}
-
-void PipeDreamAudioProcessor::splitAudio(const juce::AudioBuffer<float> &inputBuffer) {
-    for(auto& fb: audioSplitBuffers)
-    {
-        fb = inputBuffer;
-    }
-    auto sb0Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[0]);
-    auto sb1Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[1]);
-    auto sb2Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[2]);
-    auto sb3Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[3]);
-    auto sb4Block = juce::dsp::AudioBlock<float>(audioSplitBuffers[4]);
-
-    auto sb0Ctx = juce::dsp::ProcessContextReplacing<float>(sb0Block);
-    auto sb1Ctx = juce::dsp::ProcessContextReplacing<float>(sb1Block);
-    auto sb2Ctx = juce::dsp::ProcessContextReplacing<float>(sb2Block);
-    auto sb3Ctx = juce::dsp::ProcessContextReplacing<float>(sb3Block);
-    auto sb4Ctx = juce::dsp::ProcessContextReplacing<float>(sb4Block);
+    auto currentPitch  = pitchIDArray[voiceNumber]->get() + 12;
     
-    //conv1.process(sb0Ctx);
-    //put filtering here
-//
-//    LP1.process(fb0Ctx);
-//    AP2.process(fb0Ctx);
-//
-//    HP1.process(fb1Ctx);
-//    filterBuffers[2] = filterBuffers[1];
-//    LP2.process(fb1Ctx);
-//
-//    HP2.process(fb2Ctx);
     
+    bufferTransfers[voiceNumber].set(BufferWithSampleRate {std::move (bufferStore.BufBankReadP(currentPitch)),
+        bufferStore.GetSampleRate(currentPitch)});
 }
 
-void PipeDreamAudioProcessor::chordProcess() {
-//     int currentChord = ChordSel->getCurrentChoiceName().getIntValue();
-//    
-//
-//    
-//         apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
-//         apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(5.0);
-//         apvts.getParameter("Pitch_Sel_1")->endChangeGesture();
 
-
-}
 
 void PipeDreamAudioProcessor::setDecay(int bufferNum) {
     
-      auto decayTimeValue = apvts.getRawParameterValue("Decay_Time");
-      int decaySample = static_cast<int>(std::round(decayTimeValue->load() * referenceBuffers.GetSampleRate(bufferNum)));
+    auto decayTimeValue = DecayTime->get();//.apvts.getRawParameterValue("Decay_Time");
+    
+    int decaySample = static_cast<int>(std::round(decayTimeValue* referenceBuffers.GetSampleRate(bufferNum)));
 
       double stretchRatio = referenceBuffers.getSamples(bufferNum) / static_cast<double>(decaySample);
     
@@ -608,7 +576,6 @@ void PipeDreamAudioProcessor::setDecay(int bufferNum) {
 
       temp.setSize(numChannels, decaySample, false, true, false);
 
-      //bufferStore.SetBufferSizeStretch(bufferNum, numChannels, decaySample);
     
       for (int channel = 0; channel < numChannels; ++channel) {
         soundtouch.putSamples(referenceBuffers.BufBankBufferReadP1(bufferNum, channel),
@@ -621,7 +588,7 @@ void PipeDreamAudioProcessor::setDecay(int bufferNum) {
     
     //bufferStore.BufBankBufferWriteP1(bufferNum, channel) //pointer switch
     bufferStore.makecopy(bufferNum, temp);
-    //setCurrentIR(bufferNum );
+    //setCurrentIR(bufferNum);
 }
 
 void PipeDreamAudioProcessor::updateFilters() {
@@ -661,7 +628,6 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     
     updateCurrentIRs();
     updateFilters();
-    splitAudio(buffer);
     
     outGainParams[0] = outGain1->get();
     outGainParams[1] = outGain2->get();
@@ -673,8 +639,7 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     
     lowPassFilter.process(conteky);
     highPassFilter.process(conteky);
-    
-    //put filters here
+
     
     
     dry_wet_mixer.mixWetSamples(block);

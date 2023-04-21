@@ -65,10 +65,8 @@ public:
     //void repitchBuffer(juce::AudioFormatReader* reader, int bufferNum);
     void repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitone);
     void normaliseAndTrim(int bufferNum);
-    void splitAudio(const juce::AudioBuffer<float> &inputBuffer);
     void updateCurrentIRs();
     void setCurrentIRs();
-    void chordProcess();
     void setDecay(int bufferNum);
     void setCurrentIR(int voiceNumber);
     void updateFilters();
