@@ -71,6 +71,8 @@ public:
     void chordProcess();
     void setDecay(int bufferNum);
     void setCurrentIR(int voiceNumber);
+    void updateFilters();
+
 
     
     juce::AudioProcessorValueTreeState apvts;
@@ -147,7 +149,12 @@ private:
     
     juce::AudioParameterFloat* LowPassCutOff {nullptr};
     juce::AudioParameterFloat* HighPassCutOff {nullptr};
-
+    
+    //juce::dsp::LinkwitzRileyFilterType::lowpass
+    
+    juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter <float>, juce::dsp::IIR::Coefficients <float>> lowPassFilter;
+    juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter <float>, juce::dsp::IIR::Coefficients <float>> highPassFilter;
+    
     
     std::array<juce::dsp::Gain<float>, 5> outGains;
     

@@ -21,7 +21,9 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
-, apvts(*this, nullptr, "PARAMETERS", createParameterLayout()                       )
+, apvts(*this, nullptr, "PARAMETERS", createParameterLayout()),
+        lowPassFilter(juce::dsp::IIR::Coefficients<float>::makeLowPass(44100, 20000.0f, 1.0f)),
+        highPassFilter(juce::dsp::IIR::Coefficients<float>::makeHighPass(44100, 50.0f, 1.0f))
 #endif
 {
     
@@ -76,6 +78,11 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     choiceHelper(rootSel, Names::Root_Sel);
     
     boolHelper(ChordHold, Names::Chord_Hold);
+    
+    //LP.setType(juce::dsp::IIRFilterType::lowpass);
+    
+    
+
 
 }
 
@@ -197,12 +204,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         
         layout.add(std::make_unique<AudioParameterFloat>(ParameterID {params.at(Names::Low_Pass_Cut_Off), 1},
                                                              params.at(Names::Low_Pass_Cut_Off),
-                                                             NormalisableRange<float>(0, 2000, 1, 1), 400));
+                                                             NormalisableRange<float>(30, 20000, 1, 1), 20000));
         
         
         layout.add(std::make_unique<AudioParameterFloat>(ParameterID {params.at(Names::High_Pass_Cut_Off), 1},
                                                              params.at(Names::High_Pass_Cut_Off),
-                                                             NormalisableRange<float>(0, 2000, 1, 1), 400));
+                                                             NormalisableRange<float>(30, 20000, 1, 1), 50));
         
         return layout;
 }
@@ -300,6 +307,13 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     setDecay(pitchsel3->get());
     setDecay(pitchsel4->get());
     setDecay(pitchsel5->get());
+    
+    lowPassFilter.prepare(spec);
+    lowPassFilter.reset();
+    
+    highPassFilter.prepare(spec);
+    highPassFilter.reset();
+    
     
 }
     
@@ -610,6 +624,19 @@ void PipeDreamAudioProcessor::setDecay(int bufferNum) {
     //setCurrentIR(bufferNum );
 }
 
+void PipeDreamAudioProcessor::updateFilters() {
+        const float sampleRate = this->getSampleRate();
+        auto lowPassFreq = LowPassCutOff->get();
+        auto highPassFreq = HighPassCutOff->get();
+
+    
+      *lowPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(
+            sampleRate, lowPassFreq);
+    *highPassFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(
+           sampleRate, highPassFreq);
+    
+}
+
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
 //    auto chords = ChordSel->getCurrentChoiceName().getFloatValue(); //
@@ -633,6 +660,7 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     
     
     updateCurrentIRs();
+    updateFilters();
     splitAudio(buffer);
     
     outGainParams[0] = outGain1->get();
@@ -643,7 +671,11 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     ParallelConvs.process(conteky, outGainParams);
     
+    lowPassFilter.process(conteky);
+    highPassFilter.process(conteky);
+    
     //put filters here
+    
     
     dry_wet_mixer.mixWetSamples(block);
     
