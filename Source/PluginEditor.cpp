@@ -14,6 +14,9 @@
 PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p), variableTree(p.getVariableTree())
 {
+    
+    juce::LookAndFeel::setDefaultLookAndFeel(&customStyle);
+
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     //addAndMakeVisible(loadBtn);
@@ -51,11 +54,13 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     
     ChordSelSlider.onDragEnd = [this]()
     {
+        lockFlag = true;
         if (chordHoldButton.getToggleState() == 0) {
             computeChords();
         }
+        lockFlag = false;
         audioProcessor.setCurrentIRs();
-
+        //updateDecayTimes();
     };
     
     RootSelSlider.onDragEnd = [this]() {
@@ -66,86 +71,67 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
             computeChords();
 
         }
-        audioProcessor.setCurrentIRs();
+        //audioProcessor.setCurrentIRs();
+        //updateDecayTimes();
+
+        //audioProcessor.setCurrentIRs();
     };
     
     addAndMakeVisible(irName);
-    
-    auto text_box_height = 50;
-    auto text_box_width = 25;
+
     
     //pitch
     
-    PitchSel1Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    PitchSel2Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    PitchSel3Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    PitchSel4Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    PitchSel5Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    
-    PitchSel1Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    PitchSel2Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    PitchSel3Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    PitchSel4Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    PitchSel5Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    
+    makeSlider(PitchSel1Slider, "");
     PitchSel1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_1", PitchSel1Slider);
+    
+    makeSlider(PitchSel2Slider, "");
     PitchSel2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_2", PitchSel2Slider);
+    
+    makeSlider(PitchSel3Slider, "");
     PitchSel3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_3", PitchSel3Slider);
+    
+    makeSlider(PitchSel4Slider, "");
     PitchSel4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_4", PitchSel4Slider);
+    
+    makeSlider(PitchSel5Slider, "");
     PitchSel5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Pitch_Sel_5", PitchSel5Slider);
     
-    addAndMakeVisible(PitchSel1Slider);
-    addAndMakeVisible(PitchSel2Slider);
-    addAndMakeVisible(PitchSel3Slider);
-    addAndMakeVisible(PitchSel4Slider);
-    addAndMakeVisible(PitchSel5Slider);
     
     
     //gain
-
-    GainOut1Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    GainOut2Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    GainOut3Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    GainOut4Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    GainOut5Slider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     
-    GainOut1Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    GainOut2Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    GainOut3Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    GainOut4Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    GainOut5Slider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-
+    makeSlider(GainOut1Slider, " dB");
     GainOut1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_1", GainOut1Slider);
+    
+    makeSlider(GainOut2Slider, " dB");
     GainOut2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_2", GainOut2Slider);
+    
+    makeSlider(GainOut3Slider, " dB");
     GainOut3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_3", GainOut3Slider);
+    
+    makeSlider(GainOut4Slider, " dB");
     GainOut4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_4", GainOut4Slider);
+    
+    makeSlider(GainOut5Slider, " dB");
     GainOut5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_5", GainOut5Slider);
     
-    addAndMakeVisible(GainOut1Slider);
-    addAndMakeVisible(GainOut2Slider);
-    addAndMakeVisible(GainOut3Slider);
-    addAndMakeVisible(GainOut4Slider);
-    addAndMakeVisible(GainOut5Slider);
+
     
-   
     
     //chords
-    
-    ChordSelSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    RootSelSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    
-    ChordSelSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    RootSelSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    
-    addAndMakeVisible(ChordSelSlider);
-    addAndMakeVisible(RootSelSlider);
-    
+    makeSlider(ChordSelSlider, "");
+    makeLabel(ChordSelLabel, "Chord", &ChordSelSlider);
+
     ChordSelAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Chord_Sel", ChordSelSlider);
+    
+    makeSlider(RootSelSlider, "");
+    makeLabel(RootSelLabel, "Root", &RootSelSlider);
     RootSelAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Root_Sel", RootSelSlider);
 
-
+    
+    
     //lock button
-
     
     ChordHoldAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "Chord_Hold", chordHoldButton);
 
@@ -180,98 +166,108 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     addAndMakeVisible(chordHoldButton);
     //add menu item
     
-    //dry wet slider
+    //dry wet slider    //decay
     
-    DryWetSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    DryWetSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
-    
-    
-    
+    makeSlider(DryWetSlider, " %");
+    makeLabel(DryWetLabel, "Dry/Wet", &DryWetSlider);
     DryWetAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Dry_Wet", DryWetSlider);
- 
     
-    addAndMakeVisible(DryWetSlider);
-    
-    //decay
-    
-    DecaySlider.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    DecaySlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, text_box_height, text_box_width);
+    makeSlider(DecaySlider, " s");
+    makeLabel(DecayLabel, "Decay", &DecaySlider);
     DecayAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Decay_Time", DecaySlider);
- 
     
-    addAndMakeVisible(DecaySlider);
+    //filter slider
     
+    makeSlider(LowPassSlider, " Hz");
+    makeLabel(LowPassLabel, "LP", &LowPassSlider);
+    LowPassAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Low_Pass_Cut_Off", LowPassSlider);
+    
+    
+    makeSlider(HighPassSlider, " Hz");
+    makeLabel(HighPassLabel, "HP", &HighPassSlider);
+    HighPassAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "High_Pass_Cut_Off", HighPassSlider);
+
     
     DecaySlider.onDragEnd = [this]() {
-        updateDecayTimes();
-        
-//        for (int i = 0; i < 37; i++) {
-//            audioProcessor.setDecay(i);
-////            audioProcessor.setDecay(10);
-////            audioProcessor.setDecay(9);
-//        }
-        
+        //updateDecayTimes();
+        for (int i = 0; i < 5; i ++) {
+            updateDecayTime(i);
+        }
     };
     
-    PitchSel1Slider.onDragEnd = [this]() {
-        updateDecayTimes();
-
-        //audioProcessor.setCurrentIRs();
-    };
-    PitchSel2Slider.onDragEnd = [this]() {
-        updateDecayTimes();
-//audioProcessor.setCurrentIRs();
-    };
-    PitchSel3Slider.onDragEnd = [this]() {
-        updateDecayTimes();
-//audioProcessor.setCurrentIRs();
-    };
-    PitchSel4Slider.onDragEnd = [this]() {
-        //audioProcessor.setCurrentIRs();
-        updateDecayTimes();
-
-    };
-    PitchSel5Slider.onDragEnd = [this]() {
-        //audioProcessor.setCurrentIRs();
-        updateDecayTimes();
-    };
+    //if (lockFlag == false) {
+        PitchSel1Slider.onDragEnd = [this]() {
+            audioProcessor.setCurrentIR(0);
+            updateDecayTime(0);
+        };
+        PitchSel2Slider.onDragEnd = [this]() {
+            audioProcessor.setCurrentIR(1);
+            updateDecayTime(1);
+        };
+        PitchSel3Slider.onDragEnd = [this]() {
+            audioProcessor.setCurrentIR(2);
+            updateDecayTime(2);
+        };
+        PitchSel4Slider.onDragEnd = [this]() {
+            audioProcessor.setCurrentIR(3);
+            updateDecayTime(3);
+        };
+        PitchSel5Slider.onDragEnd = [this]() {
+            audioProcessor.setCurrentIR(4);
+            updateDecayTime(4);
+        };
+   // }
+    
+    //PitchSel5Slider.on
     
     
-    setSize (650, 240);
+    setSize (750, 275);
     
 
 }
 
-void PipeDreamAudioProcessorEditor::updateDecayTimes() {
-    
-    auto PitchSel1 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_1");
-    int Pitch1 = static_cast<int>(PitchSel1->load());
-    auto PitchSel2 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_2");
-    int Pitch2 = static_cast<int>(PitchSel2->load());
-    auto PitchSel3 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_3");
-    int Pitch3 = static_cast<int>(PitchSel3->load());
-    auto PitchSel4 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_4");
-    int Pitch4 = static_cast<int>(PitchSel4->load());
-    auto PitchSel5 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_5");
-    int Pitch5 = static_cast<int>(PitchSel5->load());
-    
-    audioProcessor.setDecay(Pitch1 + 12);
-    audioProcessor.setDecay(Pitch2 + 12);
-    audioProcessor.setDecay(Pitch3 + 12);
-    audioProcessor.setDecay(Pitch4 + 12);
-    audioProcessor.setDecay(Pitch5 + 12);
-    audioProcessor.setCurrentIRs();
-//
-
-//        if (chordHoldButton.getToggleState() == 1) {
-//            computeHeldChords();
-//        } else  if (chordHoldButton.getToggleState() == 0) {
-//            computeChords();
-//
-//        }
-    
-    
+void PipeDreamAudioProcessorEditor::makeSlider(juce::Slider &slider,
+                                               juce::String textValueSuffix) {
+  addAndMakeVisible(slider);
+  slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+  slider.setTextValueSuffix(textValueSuffix);
+  slider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow,
+                         false, 60, 15);
 }
+
+
+void PipeDreamAudioProcessorEditor::makeLabel(juce::Label &label,
+                                             juce::String text,
+                                             juce::Component *slider) {
+    
+  addAndMakeVisible(label);
+  label.setText(text, juce::dontSendNotification);
+  label.setJustificationType(juce::Justification::centred);
+  label.setBorderSize(juce::BorderSize<int>(0));
+  label.setBorderSize(juce::BorderSize<int>(0));
+  label.attachToComponent(slider, false);
+}
+
+
+void PipeDreamAudioProcessorEditor::updateDecayTime(int voiceNumber) {
+    std::array<std::string, 5> IDArray;
+    
+    IDArray =   {"Pitch_Sel_1",
+                "Pitch_Sel_2",
+                "Pitch_Sel_3",
+                "Pitch_Sel_4",
+                "Pitch_Sel_5"
+    };
+    
+    
+    auto currentVoice = audioProcessor.apvts.getRawParameterValue(IDArray[voiceNumber]);
+    int voice = static_cast<int>(currentVoice->load());
+    
+    audioProcessor.setDecay(voice + 12);
+    audioProcessor.setCurrentIR(voiceNumber);
+}
+
+
 
 PipeDreamAudioProcessorEditor::~PipeDreamAudioProcessorEditor()
 {
@@ -284,7 +280,6 @@ void PipeDreamAudioProcessorEditor::computeChords() {
     
     auto offsetSel = audioProcessor.apvts.getRawParameterValue("Root_Sel");
     int offset = static_cast<int>(offsetSel->load());
-
     
     audioProcessor.apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_1")->convertTo0to1(chordArray[currentChord][0] + offset - 12));
@@ -305,6 +300,17 @@ void PipeDreamAudioProcessorEditor::computeChords() {
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_5")->convertTo0to1(chordArray[currentChord][4]+ offset - 12) );
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
+    
+
+    updateDecayTime(0);
+    updateDecayTime(1);
+    updateDecayTime(2);
+    updateDecayTime(3);
+    updateDecayTime(4);
+
+
+
+    //lockFlag = false;
 
 }
 
@@ -333,6 +339,12 @@ void PipeDreamAudioProcessorEditor::computeHeldChords() {
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_5")->convertTo0to1(HeldChordValues[4] + offset - 12));
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
+    
+    updateDecayTime(0);
+    updateDecayTime(1);
+    updateDecayTime(2);
+    updateDecayTime(3);
+    updateDecayTime(4);
 
 }
 //==============================================================================
@@ -342,20 +354,21 @@ void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     
-    
-    juce::Rectangle<int> filterControlsR = filterControls.getBounds();
-    juce::Rectangle<int> chordControlsR = chordControls.getBounds();
+    juce::Rectangle<int> sidePanelR = sidePanel.getBounds();
+    juce::Rectangle<int> topPanelR = topPanel.getBounds();
     juce::Rectangle<int> pitchSelControlR = pitchSelControls.getBounds();
     juce::Rectangle<int> gainControlsR = gainControls.getBounds();
 
+    g.fillAll(juce::Colour::fromRGB(252, 248, 237));
     g.setColour(juce::Colours::grey);
     g.setColour(juce::Colours::darkgrey);
+    
     g.drawRect(pitchSelControlR);
     g.drawRect(gainControlsR);
     
-    //g.setColour (juce::Colours::red);
-    g.drawRect(filterControlsR);
-    g.drawRect(chordControlsR);
+    g.setColour (juce::Colours::red);
+    g.drawRect(sidePanelR);
+    g.drawRect(topPanelR);
     
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
@@ -375,23 +388,26 @@ void PipeDreamAudioProcessorEditor::resized()
     const auto btnWidth = getWidth() * 0.15;
     const auto btnHeight = btnWidth * 0.5;
     
-    
+   
     loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
     irName.setBounds(loadBtn.getX() + loadBtn.getWidth(), btnY, btnWidth * 2, btnHeight);
     
-    filterControls.setBounds(bounds.removeFromLeft(sidePaddingWidth));
-    chordControls.setBounds(bounds.removeFromRight(sidePaddingWidth));
+    topPanel.setBounds(bounds.removeFromTop(30));
+    sidePanel.setBounds(bounds.removeFromRight(sidePaddingWidth * 2));
     pitchSelControls.setBounds(bounds.removeFromTop(bounds.getHeight()/2));
     gainControls.setBounds(bounds);
 
     //pitch flex box
-     auto pitchBounds = pitchSelControls.getBounds().reduced(10);
+     auto pitchBounds = pitchSelControls.getBounds().reduced(15);
+     //auto pitchBounds = pitchSelControls.getBounds().reduced(15);
+
 
      juce::FlexBox flexBoxpitch;
      flexBoxpitch.flexDirection = juce::FlexBox::Direction::row;
      flexBoxpitch.flexWrap = juce::FlexBox::Wrap::noWrap;
      
      auto spacer = juce::FlexItem().withWidth(2);
+     auto spacer2 = juce::FlexItem().withHeight(10);
      
      flexBoxpitch.items.add(spacer);
      flexBoxpitch.items.add(juce::FlexItem(PitchSel1Slider).withFlex(1.f));
@@ -405,11 +421,13 @@ void PipeDreamAudioProcessorEditor::resized()
      flexBoxpitch.items.add(juce::FlexItem(PitchSel5Slider).withFlex(1.f));
      flexBoxpitch.items.add(spacer);
     
+    
      flexBoxpitch.performLayout(pitchBounds);
     
     //gain flexbox
     
-    auto gainBounds = gainControls.getBounds().reduced(10);
+    auto gainBounds = gainControls.getBounds().reduced(15);
+    //gainBounds = gainBounds.re
 
     juce::FlexBox flexBoxgain;
     flexBoxgain.flexDirection = juce::FlexBox::Direction::row;
@@ -428,45 +446,58 @@ void PipeDreamAudioProcessorEditor::resized()
     flexBoxgain.items.add(spacer);
     flexBoxgain.items.add(juce::FlexItem(GainOut5Slider).withFlex(1.f));
     flexBoxgain.items.add(spacer);
+    
+    
+    
+//    flexBoxgain.items.add(juce::FlexItem().withHeight(15));
+//    flexBoxgain.items.add(juce::FlexItem().withHeight(30));
+
    
     flexBoxgain.performLayout(gainBounds);
    
     //chords flexbox
     
-    auto chordBounds = chordControls.getBounds().reduced(10);
-
-    auto buttonBounds = chordBounds.removeFromTop(30);
-    chordHoldButton.setBounds(buttonBounds);
+    //auto chordBoundZ = sidePanel.getBounds(); //.removeFromTop(sidePanel.getY()/2).reduced(10);
+    auto chordBounds = sidePanel.getBounds().removeFromTop(sidePanel.getBounds().getHeight()/2).reduced(10);
+    //auto buttonBounds = chordBounds.removeFromTop(30);
+    //chordHoldButton.setBounds(topPanel.getBounds().removeFromRight(50));
     //buttonBounds.getX() + buttonBounds.getX() / 2, buttonBounds.getY(), 50, 50)
     juce::FlexBox flexBoxChords;
-    flexBoxChords.flexDirection = juce::FlexBox::Direction::column;
+    flexBoxChords.flexDirection = juce::FlexBox::Direction::row;
     flexBoxChords.flexWrap = juce::FlexBox::Wrap::noWrap;
     
-    flexBoxChords.items.add(spacer);
+    flexBoxgain.items.add(spacer);
     flexBoxChords.items.add(juce::FlexItem(RootSelSlider).withFlex(1.f));
-    flexBoxChords.items.add(spacer);
+    flexBoxgain.items.add(spacer);
     flexBoxChords.items.add(juce::FlexItem(ChordSelSlider).withFlex(1.f));
-    flexBoxChords.items.add(spacer);
+    flexBoxgain.items.add(spacer);
+    flexBoxChords.items.add(juce::FlexItem(DecaySlider).withFlex(1.f));
+    flexBoxgain.items.add(spacer);
+
     
     flexBoxChords.performLayout(chordBounds);
     
     //filter flexbox
     
-    auto filterBounds = filterControls.getBounds().reduced(10);
-
+    auto filterBounds = sidePanel.getBounds().removeFromBottom(sidePanel.getBounds().getHeight()/2).reduced(10);
+    
+    //auto button2Bounds = filterBounds.removeFromTop(30);
+    
     //buttonBounds.getX() + buttonBounds.getX() / 2, buttonBounds.getY(), 50, 50)
     juce::FlexBox flexBoxFilter;
-    flexBoxFilter.flexDirection = juce::FlexBox::Direction::column;
+    flexBoxFilter.flexDirection = juce::FlexBox::Direction::row;
     flexBoxFilter.flexWrap = juce::FlexBox::Wrap::noWrap;
     
-    flexBoxFilter.items.add(spacer);
+    flexBoxgain.items.add(spacer);
+
+    flexBoxFilter.items.add(juce::FlexItem(LowPassSlider).withFlex(1.f));
+    flexBoxgain.items.add(spacer);
+    flexBoxFilter.items.add(juce::FlexItem(HighPassSlider).withFlex(1.f));
+    flexBoxgain.items.add(spacer);
     flexBoxFilter.items.add(juce::FlexItem(DryWetSlider).withFlex(1.f));
-    flexBoxFilter.items.add(spacer);
-    flexBoxFilter.items.add(juce::FlexItem(DecaySlider).withFlex(1.f));
-    flexBoxFilter.items.add(spacer);
-    
+    flexBoxgain.items.add(spacer);
+
     flexBoxFilter.performLayout(filterBounds);
-    
     
     
 }

@@ -70,6 +70,7 @@ public:
     void setCurrentIRs();
     void chordProcess();
     void setDecay(int bufferNum);
+    void setCurrentIR(int voiceNumber);
 
     
     juce::AudioProcessorValueTreeState apvts;
@@ -143,11 +144,16 @@ private:
     
     juce::AudioParameterFloat* DryWet {nullptr};
     juce::AudioParameterFloat* DecayTime {nullptr};
+    
+    juce::AudioParameterFloat* LowPassCutOff {nullptr};
+    juce::AudioParameterFloat* HighPassCutOff {nullptr};
 
     
     std::array<juce::dsp::Gain<float>, 5> outGains;
     
     soundtouch::SoundTouch soundtouch;
+    
+    std::array<juce::AudioBuffer<float>, 5> bufferCache;
     
     //juce::dsp::Gain<float> testGain;
     

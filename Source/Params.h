@@ -33,7 +33,10 @@ enum Names {
     Chord_Hold,
     
     Dry_Wet,
-    Decay_Time
+    Decay_Time,
+    
+    Low_Pass_Cut_Off,
+    High_Pass_Cut_Off
     
     
     
@@ -61,8 +64,8 @@ inline const std::map<Names, juce::String>& GetParams()
         {Dry_Wet, "Dry_Wet"},
         {Decay_Time, "Decay_Time"},
         
-        
-        
+        {Low_Pass_Cut_Off, "Low_Pass_Cut_Off"},
+        {High_Pass_Cut_Off, "High_Pass_Cut_Off"}
         
     };
     

@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "Params.h"
+#include "LooknFeel.h"
 
 //==============================================================================
 /**
@@ -26,12 +27,16 @@ public:
     void resized() override;
     void computeChords();
     void computeHeldChords();
-    void updateDecayTimes();
+    void updateDecayTime(int voiceNumber);
+    void makeSlider(juce::Slider &slider, juce::String textValueSuffix);
+    void makeLabel(juce::Label &label, juce::String text, juce::Component *slider);
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     
+    juce::CustomStyle customStyle;
+
     int chordArray[9][5] = {
         {0, 0, 0, 0, 0}, // Mono
         {0, 0, 0, 7, 7}, // 5th
@@ -47,8 +52,9 @@ private:
     std::array<int, 5> HeldChordValues;
     //std::array<int, 5> currentChordValues;
     
-   
+    //std::Atomic lockValue = 4;
     
+    bool lockFlag = false;
     
     PipeDreamAudioProcessor& audioProcessor;
     juce::ValueTree& variableTree;
@@ -66,10 +72,26 @@ private:
     juce::Slider GainOut5Slider;
     
     juce::Slider ChordSelSlider;
+    juce::Label ChordSelLabel;
+    
     juce::Slider RootSelSlider;
+    juce::Label RootSelLabel;
     
     juce::Slider DryWetSlider;
+    juce::Label DryWetLabel;
     juce::Slider DecaySlider;
+    juce::Label DecayLabel;
+    
+    juce::Slider LowPassSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> LowPassAttachment;
+    juce::Label LowPassLabel;
+    
+    juce::Slider HighPassSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> HighPassAttachment;
+    juce::Label HighPassLabel;
+    
+
+
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> DryWetAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> DecayAttachment;
@@ -97,6 +119,8 @@ private:
     juce::Component gainControls;
     juce::Component filterControls;
     juce::Component chordControls;
+    juce::Component topPanel;
+    juce::Component sidePanel;
     
     
 //    juce::Identifier FilePath1;

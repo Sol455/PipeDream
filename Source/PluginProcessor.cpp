@@ -69,6 +69,9 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     floatHelper(DryWet, Names::Dry_Wet);
     floatHelper(DecayTime, Names::Decay_Time);
     
+    floatHelper(LowPassCutOff, Names::Low_Pass_Cut_Off);
+    floatHelper(HighPassCutOff, Names::High_Pass_Cut_Off);
+    
     choiceHelper(ChordSel, Names::Chord_Sel);
     choiceHelper(rootSel, Names::Root_Sel);
     
@@ -184,7 +187,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         
         //Decay
         
-        auto decayRange = NormalisableRange<float>(0.f, 2.f, 0.01);
+        auto decayRange = NormalisableRange<float>(0.f, 3.f, 0.01);
 
         
         layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Decay_Time), 1},
@@ -192,7 +195,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout
                                                         decayRange,
                                                         1 ));
         
-
+        layout.add(std::make_unique<AudioParameterFloat>(ParameterID {params.at(Names::Low_Pass_Cut_Off), 1},
+                                                             params.at(Names::Low_Pass_Cut_Off),
+                                                             NormalisableRange<float>(0, 2000, 1, 1), 400));
+        
+        
+        layout.add(std::make_unique<AudioParameterFloat>(ParameterID {params.at(Names::High_Pass_Cut_Off), 1},
+                                                             params.at(Names::High_Pass_Cut_Off),
+                                                             NormalisableRange<float>(0, 2000, 1, 1), 400));
+        
         return layout;
 }
 
@@ -278,11 +289,17 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     readIRFromFile(2, 0);
     ParallelConvs.prepare(spec);
     
-    
     for(auto& buffer: audioSplitBuffers)
     {
         buffer.setSize(spec.numChannels, samplesPerBlock);
     }
+    
+    setCurrentIRs();
+    setDecay(pitchsel1->get());
+    setDecay(pitchsel2->get());
+    setDecay(pitchsel3->get());
+    setDecay(pitchsel4->get());
+    setDecay(pitchsel5->get());
     
 }
     
@@ -503,6 +520,22 @@ void PipeDreamAudioProcessor::setCurrentIRs() {
 
 }
 
+void PipeDreamAudioProcessor::setCurrentIR(int voiceNumber) {
+    
+    std::array<int, 5> pitches;
+    
+    pitches = {
+        pitchsel1->get() + 12,
+        pitchsel2->get() + 12,
+        pitchsel3->get() + 12,
+        pitchsel4->get() + 12,
+        pitchsel5->get() + 12
+    };
+    
+    bufferTransfers[voiceNumber].set(BufferWithSampleRate {std::move (bufferStore.BufBankReadP(pitches[voiceNumber])),
+        bufferStore.GetSampleRate(pitches[voiceNumber])});
+}
+
 void PipeDreamAudioProcessor::splitAudio(const juce::AudioBuffer<float> &inputBuffer) {
     for(auto& fb: audioSplitBuffers)
     {
@@ -549,10 +582,7 @@ void PipeDreamAudioProcessor::chordProcess() {
 void PipeDreamAudioProcessor::setDecay(int bufferNum) {
     
       auto decayTimeValue = apvts.getRawParameterValue("Decay_Time");
-      //int decaySample = static_cast<int>(std::round(decayTimeValue->load() * this->getSampleRate()));
       int decaySample = static_cast<int>(std::round(decayTimeValue->load() * referenceBuffers.GetSampleRate(bufferNum)));
-    //std::cout << "\ndecaySample:" << decaySample;
-
 
       double stretchRatio = referenceBuffers.getSamples(bufferNum) / static_cast<double>(decaySample);
     
@@ -575,8 +605,9 @@ void PipeDreamAudioProcessor::setDecay(int bufferNum) {
         soundtouch.clear();
       }
     
-    //bufferStore.BufBankBufferWriteP1(bufferNum, channel)
+    //bufferStore.BufBankBufferWriteP1(bufferNum, channel) //pointer switch
     bufferStore.makecopy(bufferNum, temp);
+    //setCurrentIR(bufferNum );
 }
 
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
@@ -611,6 +642,8 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     outGainParams[4] = outGain5->get();
 
     ParallelConvs.process(conteky, outGainParams);
+    
+    //put filters here
     
     dry_wet_mixer.mixWetSamples(block);
     
