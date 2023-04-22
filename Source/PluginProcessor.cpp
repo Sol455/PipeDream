@@ -67,10 +67,8 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     floatHelper(outGain3, Names::Gain_Out_3);
     floatHelper(outGain4, Names::Gain_Out_4);
     floatHelper(outGain5, Names::Gain_Out_5);
-    
     floatHelper(DryWet, Names::Dry_Wet);
     floatHelper(DecayTime, Names::Decay_Time);
-    
     floatHelper(LowPassCutOff, Names::Low_Pass_Cut_Off);
     floatHelper(HighPassCutOff, Names::High_Pass_Cut_Off);
     
@@ -79,10 +77,7 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     
     boolHelper(ChordHold, Names::Chord_Hold);
     
-    //LP.setType(juce::dsp::IIRFilterType::lowpass);
-    
-    
-
+    UserIRFilePath = apvts.state.getPropertyAsValue("UserIRFilePath", nullptr, true);
 
 }
 
@@ -194,7 +189,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         
         //Decay
         
-        auto decayRange = NormalisableRange<float>(0.f, 3.f, 0.01);
+        auto decayRange = NormalisableRange<float>(0.1f, 2.f, 0.01);
 
         
         layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Decay_Time), 1},
@@ -541,9 +536,8 @@ void PipeDreamAudioProcessor::setCurrentIRs() {
 void PipeDreamAudioProcessor::setCurrentIR(int voiceNumber) {
     
     
-    std::array<juce::AudioParameterInt*, 5> pitchIDArray;
-    
-    pitchIDArray = {
+    std::array<juce::AudioParameterInt*, 5> pitchIDArray =
+    {
         pitchsel1,
         pitchsel2,
         pitchsel3,
@@ -591,6 +585,35 @@ void PipeDreamAudioProcessor::setDecay(int bufferNum) {
     //setCurrentIR(bufferNum);
 }
 
+void PipeDreamAudioProcessor::updateDecayTime(int voiceNumber) {
+
+//    std::array<std::string, 5> IDArray;
+//
+//    IDArray =   {"Pitch_Sel_1",
+//                "Pitch_Sel_2",
+//                "Pitch_Sel_3",
+//                "Pitch_Sel_4",
+//                "Pitch_Sel_5"
+//    };
+    
+    
+    std::array<juce::AudioParameterInt*, 5> decayIDarray = {
+        pitchsel1,
+        pitchsel2,
+        pitchsel3,
+        pitchsel4,
+        pitchsel5
+    };
+
+    auto voice =  decayIDarray[voiceNumber]->get();
+    
+//    auto currentVoice = apvts.getRawParameterValue(IDArray[voiceNumber]);
+//    int voice = static_cast<int>(currentVoice->load());
+    
+    setDecay(voice + 12);
+    setCurrentIR(voiceNumber);
+}
+
 void PipeDreamAudioProcessor::updateFilters() {
         const float sampleRate = this->getSampleRate();
         auto lowPassFreq = LowPassCutOff->get();
@@ -603,6 +626,7 @@ void PipeDreamAudioProcessor::updateFilters() {
            sampleRate, highPassFreq);
     
 }
+
 
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {

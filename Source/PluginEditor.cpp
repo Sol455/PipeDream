@@ -37,17 +37,18 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
             {
                 audioProcessor.savedFile = result;
                 audioProcessor.root = result.getParentDirectory().getFullPathName();
-                //variableTree.setProperty("FilePath1", audioProcessor.savedFile.getFullPathName(), nullptr);
+                audioProcessor.UserIRFilePath.setValue(audioProcessor.savedFile.getFullPathName());
+                std::cout << audioProcessor.UserIRFilePath.getValue().toString();
                 
                 //variableTree.setProperty("FilePath2", "WAG1", nullptr);
                 //audioProcessor.variableTree.setProperty("Root", audioProcessor.savedFile.getParentDirectory().getFullPathName(), nullptr);
-                audioProcessor.conv1.reset();
+                //audioProcessor.conv1.reset();
 //                audioProcessor.irLoader.loadImpulseResponse(audioProcessor.savedFile,
 //                                                            juce::dsp::Convolution::Stereo::yes,
 //                                                            juce::dsp::Convolution::Trim::yes,
 //                                                            0);
 //                
-                irName.setText(result.getFileName(), juce::dontSendNotification);
+                //irName.setText(result.getFileName(), juce::dontSendNotification);
             }
         });
     };
@@ -192,39 +193,52 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     DecaySlider.onDragEnd = [this]() {
         //updateDecayTimes();
         for (int i = 0; i < 5; i ++) {
-            updateDecayTime(i);
+            audioProcessor.updateDecayTime(i);
         }
     };
     
     //if (lockFlag == false) {
         PitchSel1Slider.onDragEnd = [this]() {
             audioProcessor.setCurrentIR(0);
-            updateDecayTime(0);
+            audioProcessor.updateDecayTime(0);
         };
         PitchSel2Slider.onDragEnd = [this]() {
             audioProcessor.setCurrentIR(1);
-            updateDecayTime(1);
+            audioProcessor.updateDecayTime(1);
         };
         PitchSel3Slider.onDragEnd = [this]() {
             audioProcessor.setCurrentIR(2);
-            updateDecayTime(2);
+            audioProcessor.updateDecayTime(2);
         };
         PitchSel4Slider.onDragEnd = [this]() {
             audioProcessor.setCurrentIR(3);
-            updateDecayTime(3);
+            audioProcessor.updateDecayTime(3);
         };
         PitchSel5Slider.onDragEnd = [this]() {
             audioProcessor.setCurrentIR(4);
-            updateDecayTime(4);
+            audioProcessor.updateDecayTime(4);
         };
    // }
     
     //PitchSel5Slider.on
     
+    addAndMakeVisible (IRSelect);
+    IRSelect.addItem ("PVC",  1);
+    IRSelect.addItem ("Glass",   2);
+    IRSelect.addItem ("Metal", 3);
+    IRSelect.addItem ("User", 4);
+     
+    IRSelect.onChange = [this] { IRChanged(); };
+    IRSelect.setSelectedId (1);
+    
     
     setSize (750, 275);
     
 
+}
+
+void PipeDreamAudioProcessorEditor::IRChanged() {
+    
 }
 
 void PipeDreamAudioProcessorEditor::makeSlider(juce::Slider &slider,
@@ -250,21 +264,21 @@ void PipeDreamAudioProcessorEditor::makeLabel(juce::Label &label,
 }
 
 
-void PipeDreamAudioProcessorEditor::updateDecayTime(int voiceNumber) {
-
-    IDArray =   {"Pitch_Sel_1",
-                "Pitch_Sel_2",
-                "Pitch_Sel_3",
-                "Pitch_Sel_4",
-                "Pitch_Sel_5"
-    };
-    
-    auto currentVoice = audioProcessor.apvts.getRawParameterValue(IDArray[voiceNumber]);
-    int voice = static_cast<int>(currentVoice->load());
-    
-    audioProcessor.setDecay(voice + 12);
-    audioProcessor.setCurrentIR(voiceNumber);
-}
+//void PipeDreamAudioProcessorEditor::updateDecayTime(int voiceNumber) {
+//
+//    IDArray =   {"Pitch_Sel_1",
+//                "Pitch_Sel_2",
+//                "Pitch_Sel_3",
+//                "Pitch_Sel_4",
+//                "Pitch_Sel_5"
+//    };
+//    
+//    auto currentVoice = audioProcessor.apvts.getRawParameterValue(IDArray[voiceNumber]);
+//    int voice = static_cast<int>(currentVoice->load());
+//    
+//    audioProcessor.setDecay(voice + 12);
+//    audioProcessor.setCurrentIR(voiceNumber);
+//}
 
 
 
@@ -280,36 +294,39 @@ void PipeDreamAudioProcessorEditor::computeChords() {
     auto offsetSel = audioProcessor.apvts.getRawParameterValue("Root_Sel");
     int offset = static_cast<int>(offsetSel->load());
     
+    //set to current pitch firdt
+    //1 change parameter 2, update current IR to match parameter, configure decay, re-write
+    
     audioProcessor.apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_1")->convertTo0to1(chordArray[currentChord][0] + offset - 12));
-    audioProcessor.apvts.getParameter("Pitch_Sel_1")->endChangeGesture();
-    
+    audioProcessor.apvts.getParameter("Pitch_Sel_1")->endChangeGesture(); //set pitch sel 1
+    audioProcessor.setCurrentIR(0);
+    audioProcessor.updateDecayTime(0);
+
     audioProcessor.apvts.getParameter("Pitch_Sel_2")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_2")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_2")->convertTo0to1(chordArray[currentChord][1]+ offset - 12)) ;
     audioProcessor.apvts.getParameter("Pitch_Sel_2")->endChangeGesture();
+    audioProcessor.setCurrentIR(1);
+    audioProcessor.updateDecayTime(1);
     
     audioProcessor.apvts.getParameter("Pitch_Sel_3")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_3")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_3")->convertTo0to1(chordArray[currentChord][2]+ offset - 12)) ;
     audioProcessor.apvts.getParameter("Pitch_Sel_3")->endChangeGesture();
+    audioProcessor.setCurrentIR(2);
+    audioProcessor.updateDecayTime(2);
     
     audioProcessor.apvts.getParameter("Pitch_Sel_4")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_4")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_4")->convertTo0to1(chordArray[currentChord][3]+ offset - 12) );
     audioProcessor.apvts.getParameter("Pitch_Sel_4")->endChangeGesture();
+    audioProcessor.setCurrentIR(3);
+    audioProcessor.updateDecayTime(3);
     
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_5")->convertTo0to1(chordArray[currentChord][4]+ offset - 12) );
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
+    audioProcessor.setCurrentIR(4);
+    audioProcessor.updateDecayTime(4);
     
-
-    updateDecayTime(0);
-    updateDecayTime(1);
-    updateDecayTime(2);
-    updateDecayTime(3);
-    updateDecayTime(4);
-
-
-
-    //lockFlag = false;
 
 }
 
@@ -322,28 +339,33 @@ void PipeDreamAudioProcessorEditor::computeHeldChords() {
     audioProcessor.apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_1")->convertTo0to1(HeldChordValues[0] + offset - 12));
     audioProcessor.apvts.getParameter("Pitch_Sel_1")->endChangeGesture();
+    audioProcessor.setCurrentIR(0);
+    audioProcessor.updateDecayTime(0);
 
     audioProcessor.apvts.getParameter("Pitch_Sel_2")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_2")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_2")->convertTo0to1(HeldChordValues[1] + offset - 12)) ;
     audioProcessor.apvts.getParameter("Pitch_Sel_2")->endChangeGesture();
+    audioProcessor.setCurrentIR(1);
+    audioProcessor.updateDecayTime(1);
 
     audioProcessor.apvts.getParameter("Pitch_Sel_3")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_3")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_3")->convertTo0to1(HeldChordValues[2] + offset - 12)) ;
     audioProcessor.apvts.getParameter("Pitch_Sel_3")->endChangeGesture();
+    audioProcessor.setCurrentIR(2);
+    audioProcessor.updateDecayTime(2);
 
     audioProcessor.apvts.getParameter("Pitch_Sel_4")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_4")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_4")->convertTo0to1(HeldChordValues[3] + offset - 12) );
     audioProcessor.apvts.getParameter("Pitch_Sel_4")->endChangeGesture();
+    audioProcessor.setCurrentIR(3);
+    audioProcessor.updateDecayTime(3);
 
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_5")->convertTo0to1(HeldChordValues[4] + offset - 12));
     audioProcessor.apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
+    audioProcessor.setCurrentIR(4);
+    audioProcessor.updateDecayTime(4);
     
-    updateDecayTime(0);
-    updateDecayTime(1);
-    updateDecayTime(2);
-    updateDecayTime(3);
-    updateDecayTime(4);
 
 }
 //==============================================================================
@@ -362,12 +384,12 @@ void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour(juce::Colours::grey);
     g.setColour(juce::Colours::darkgrey);
     
-    g.drawRect(pitchSelControlR);
-    g.drawRect(gainControlsR);
-    
-    //g.setColour (juce::Colours::red);
-    g.drawRect(sidePanelR);
-    g.drawRect(topPanelR);
+//    g.drawRect(pitchSelControlR);
+//    g.drawRect(gainControlsR);
+//
+//    //g.setColour (juce::Colours::red);
+//    g.drawRect(sidePanelR);
+//    g.drawRect(topPanelR);
     
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
@@ -492,10 +514,11 @@ void PipeDreamAudioProcessorEditor::resized()
     auto chordBounds = sidePanel.getBounds().removeFromTop(sidePanel.getBounds().getHeight()/2).reduced(10);
     //auto buttonBounds = chordBounds.removeFromTop(30);
     
-    auto buttonBounds = topPanel.getBounds().removeFromRight(sidePaddingWidth * 2);
+    auto buttonBounds = topPanel.getBounds().removeFromRight(sidePaddingWidth * 3);
     
-    chordHoldButton.setBounds(buttonBounds.removeFromRight(buttonBounds.getWidth()/2).reduced(2));
-    LoadButton.setBounds(buttonBounds.reduced(2));
+    chordHoldButton.setBounds(buttonBounds.removeFromRight(buttonBounds.getWidth()/3).reduced(2));
+    LoadButton.setBounds(buttonBounds.removeFromRight(buttonBounds.getWidth()/2).reduced(2));
+    IRSelect.setBounds(buttonBounds.reduced(2));
     //buttonBounds.getX() + buttonBounds.getX() / 2, buttonBounds.getY(), 50, 50)
     juce::FlexBox flexBoxChords;
     flexBoxChords.flexDirection = juce::FlexBox::Direction::row;

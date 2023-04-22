@@ -70,6 +70,8 @@ public:
     void setDecay(int bufferNum);
     void setCurrentIR(int voiceNumber);
     void updateFilters();
+    void updateDecayTime(int voiceNumber);
+    void computeChords();
 
 
     
@@ -119,9 +121,12 @@ public:
     std::array<float, 5> outGainParams;
     
     juce::dsp::DryWetMixer<float> dry_wet_mixer;
-
-
     
+    juce::Value UserIRFilePath = apvts.state.getPropertyAsValue("UserIRFilePath", nullptr, true);
+
+
+
+
 private:
     //==============================================================================
     
@@ -161,6 +166,10 @@ private:
     std::array<juce::AudioBuffer<float>, 5> bufferCache;
     
     //juce::dsp::Gain<float> testGain;
+    
+    
+
+    
     
     
     //std::array<int>, 5, 9> chordArray;

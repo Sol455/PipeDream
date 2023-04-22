@@ -25,11 +25,13 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
-    void computeChords();
     void computeHeldChords();
+    void computeChords();
     void updateDecayTime(int voiceNumber);
     void makeSlider(juce::Slider &slider, juce::String textValueSuffix);
     void makeLabel(juce::Label &label, juce::String text, juce::Component *slider);
+    void IRChanged();
+
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -37,10 +39,6 @@ private:
     
     juce::CustomStyle customStyle;
     
-    std::array<std::string, 5> IDArray;
-    
-
-
     int chordArray[9][5] = {
         {0, 0, 0, 0, 0}, // Mono
         {0, 0, 0, 7, 7}, // 5th
@@ -93,10 +91,7 @@ private:
     juce::Slider HighPassSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> HighPassAttachment;
     juce::Label HighPassLabel;
-    
-
-
-    
+        
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> DryWetAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> DecayAttachment;
 
@@ -130,11 +125,11 @@ private:
     juce::Label GainLabel;
     juce::Label TitleLabel;
 
-    
     juce::TextButton chordHoldButton {"Hold"};
     juce::TextButton LoadButton {"Load"};
+    
+    juce::ComboBox IRSelect;
 
-        
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> ChordHoldAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PipeDreamAudioProcessorEditor)
