@@ -160,6 +160,7 @@ private:
     
     juce::AudioParameterFloat* GainInM {nullptr};
     juce::AudioParameterFloat* GainOutM {nullptr};
+    juce::dsp::Gain<float> inputGainM, outputGainM;
     
     //juce::dsp::LinkwitzRileyFilterType::lowpass
     

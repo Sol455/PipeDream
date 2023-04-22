@@ -337,6 +337,12 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     highPassFilter.prepare(spec);
     highPassFilter.reset();
     
+    inputGainM.prepare(spec);
+    outputGainM.prepare(spec);
+    
+    inputGainM.setRampDurationSeconds(0.05);
+    outputGainM.setRampDurationSeconds(0.05);
+    
     
 }
     
@@ -679,12 +685,19 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    inputGainM.setGainDecibels(GainInM->get());
+    outputGainM.setGainDecibels(GainOutM->get());
+    
     auto dry_wet_ratio = DryWet->get();
     
     //setCurrentIRs();
 
     juce::dsp::AudioBlock<float> block {buffer};
     auto conteky = juce::dsp::ProcessContextReplacing<float>(block);
+
+    //in gain
+    inputGainM.process(conteky);
 
     
     dry_wet_mixer.pushDrySamples(block);
@@ -708,6 +721,11 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     
     
     dry_wet_mixer.mixWetSamples(block);
+    //out gain
+    outputGainM.process(conteky);
+    
+    
+
     
 
     

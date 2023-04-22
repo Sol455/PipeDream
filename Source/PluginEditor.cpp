@@ -381,6 +381,8 @@ void PipeDreamAudioProcessorEditor::computeHeldChords() {
 void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
 {
     auto sidePaddingWidth = 200;
+    int spacerTop = 18;
+    int linespacer = 30;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     
@@ -391,9 +393,19 @@ void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
     juce::Rectangle<int> pitchSelControlR = pitchSelControls.getBounds();
     juce::Rectangle<int> gainControlsR = gainControls.getBounds();
 
-    g.fillAll(juce::Colour::fromRGB(252, 248, 237));
-    g.setColour(juce::Colours::grey);
-    g.setColour(juce::Colours::darkgrey);
+    g.fillAll(juce::Colour::fromRGB(255, 247, 230));
+    
+    //g.setColour(juce::Colours::grey);
+    //g.setColour(juce::Colours::darkgrey);
+    
+    juce::Line<float> linePitch (juce::Point<float> (pitchSelControls.getX() + linespacer, pitchSelControls.getY() + spacerTop + 5),
+                            juce::Point<float> (pitchSelControls.getX() + pitchSelControls.getWidth() - linespacer, pitchSelControls.getY() + spacerTop + 5));
+    
+    juce::Line<float> lineGain (juce::Point<float> (gainControls.getX() + linespacer, gainControls.getY() + spacerTop + 5),
+                            juce::Point<float> (gainControls.getX() + gainControls.getWidth() - linespacer, gainControls.getY() + spacerTop + 5));
+ 
+   // g.drawLine (linePitch, 2.0f);
+    //g.drawLine (lineGain, 2.0f);
 //
 //    g.drawRect(pitchSelControlR);
 //    g.drawRect(gainControlsR);
