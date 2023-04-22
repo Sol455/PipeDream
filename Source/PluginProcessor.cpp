@@ -312,6 +312,7 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     setDecay(pitchsel3->get());
     setDecay(pitchsel4->get());
     setDecay(pitchsel5->get());
+    updateCurrentIRs();
     
     lowPassFilter.prepare(spec);
     lowPassFilter.reset();
@@ -734,26 +735,38 @@ juce::AudioProcessorEditor* PipeDreamAudioProcessor::createEditor()
 //==============================================================================
 void PipeDreamAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    apvts.state.appendChild(variableTree, nullptr);
-    juce::MemoryOutputStream stream(destData, false);
-    apvts.state.writeToStream (stream);
+//    apvts.state.appendChild(variableTree, nullptr);
+//    juce::MemoryOutputStream stream(destData, false);
+//    apvts.state.writeToStream (stream);
+    
+    juce::MemoryOutputStream mos(destData, true);
+    apvts.state.writeToStream(mos);
 }
 
 void PipeDreamAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    auto tree = juce::ValueTree::readFromData(data, size_t(sizeInBytes));
-    variableTree = tree.getChildWithName("variables");
+//    auto tree = juce::ValueTree::readFromData(data, size_t(sizeInBytes));
+//    variableTree = tree.getChildWithName("variables");
+//
+//    if (tree.isValid())
+//    {
+//        apvts.state = tree;
+//
+//        savedFile = variableTree.getProperty("file1");
+//        //root = variableTree.getProperty("root");
+//
+//        //irLoader.loadImpulseResponse(savedFile, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0);
+//
+//    }
     
-    if (tree.isValid())
-    {
-        apvts.state = tree;
-        
-        savedFile = variableTree.getProperty("file1");
-        root = variableTree.getProperty("root");
-        
-        //irLoader.loadImpulseResponse(savedFile, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0);
-        
-    }
+    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
+
+        if (tree.isValid()) {
+            apvts.replaceState(tree);
+            UserIRFilePath.referTo(apvts.state.getPropertyAsValue("IR_select", nullptr, true));
+            loadUserIR();
+        }
+    
 }
 
 //==============================================================================
