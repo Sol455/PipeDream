@@ -118,14 +118,16 @@ private:
     
     juce::Component pitchSelControls;
     juce::Component gainControls;
-    juce::Component filterControls;
-    juce::Component chordControls;
+    juce::Component rightPanel;
+    juce::Component leftPanel;
     juce::Component topPanel;
-    juce::Component sidePanel;
+    juce::Component bottomPanel;
+
     
     juce::Label TubeLengthLabel;
     juce::Label GainLabel;
     juce::Label TitleLabel;
+    
 
     juce::TextButton chordHoldButton {"Hold"};
     juce::TextButton LoadButton {"Load"};
@@ -133,6 +135,18 @@ private:
     juce::ComboBox IRSelect;
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> ChordHoldAttachment;
+    
+    //Master Gains
+    
+    juce::Slider GainInMSlider;
+    juce::Label  GainInMLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> GainInMAttachment;
+    
+    juce::Slider GainOutMSlider;
+    juce::Label  GainOutMLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> GainOutMAttachment;
+    
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PipeDreamAudioProcessorEditor)
 };

@@ -178,7 +178,17 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     makeSlider(HighPassSlider, " Hz");
     makeLabel(HighPassLabel, "HP", &HighPassSlider);
     HighPassAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "High_Pass_Cut_Off", HighPassSlider);
-
+    
+    //Master Gain slider
+    
+    makeSlider(GainInMSlider, " Db");
+    makeLabel(GainInMLabel, "Gain In", &GainInMSlider);
+    GainInMAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_In_Master", GainInMSlider);
+    
+    makeSlider(GainOutMSlider, " Db");
+    makeLabel(GainOutMLabel, "Gain Out", &GainOutMSlider);
+    GainOutMAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Gain_Out_Master", GainOutMSlider);
+    
     
     DecaySlider.onDragEnd = [this]() {
         //updateDecayTimes();
@@ -227,7 +237,7 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     //IRSelect.setSelectedId (1);
     
     
-    setSize (750, 275);
+    setSize (750, 320);
     
 
 }
@@ -370,25 +380,28 @@ void PipeDreamAudioProcessorEditor::computeHeldChords() {
 //==============================================================================
 void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    auto sidePaddingWidth = 120;
+    auto sidePaddingWidth = 200;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     
-    juce::Rectangle<int> sidePanelR = sidePanel.getBounds();
+    juce::Rectangle<int> rightPanelR = rightPanel.getBounds();
+    juce::Rectangle<int> leftPanelR = rightPanel.getBounds();
     juce::Rectangle<int> topPanelR = topPanel.getBounds();
+    juce::Rectangle<int> botPanelR = bottomPanel.getBounds();
     juce::Rectangle<int> pitchSelControlR = pitchSelControls.getBounds();
     juce::Rectangle<int> gainControlsR = gainControls.getBounds();
 
     g.fillAll(juce::Colour::fromRGB(252, 248, 237));
     g.setColour(juce::Colours::grey);
     g.setColour(juce::Colours::darkgrey);
-    
+//
 //    g.drawRect(pitchSelControlR);
 //    g.drawRect(gainControlsR);
 //
-//    //g.setColour (juce::Colours::red);
-//    g.drawRect(sidePanelR);
+//    g.drawRect(leftPanelR);
+//    g.drawRect(rightPanelR);
 //    g.drawRect(topPanelR);
+//    g.drawRect(botPanelR);
     
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
@@ -401,7 +414,7 @@ void PipeDreamAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    auto sidePaddingWidth = 120;
+  
     
     auto bounds = getLocalBounds();
     
@@ -411,14 +424,19 @@ void PipeDreamAudioProcessorEditor::resized()
     const auto btnHeight = btnWidth * 0.5;
     
     int spacerTop = 18;
+    int topBotPanelWidth = 40;
+    int sidePaddingWidth = 150;
 
     
    
-    loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
-    irName.setBounds(loadBtn.getX() + loadBtn.getWidth(), btnY, btnWidth * 2, btnHeight);
+//    loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
+//    irName.setBounds(loadBtn.getX() + loadBtn.getWidth(), btnY, btnWidth * 2, btnHeight);
     
-    topPanel.setBounds(bounds.removeFromTop(40));
-    sidePanel.setBounds(bounds.removeFromRight(sidePaddingWidth * 2));
+    topPanel.setBounds(bounds.removeFromTop(topBotPanelWidth));
+    bottomPanel.setBounds(bounds.removeFromBottom(topBotPanelWidth));
+    rightPanel.setBounds(bounds.removeFromRight(sidePaddingWidth));
+    leftPanel.setBounds(bounds.removeFromLeft(sidePaddingWidth));
+
     pitchSelControls.setBounds(bounds.removeFromTop(bounds.getHeight()/2));
     gainControls.setBounds(bounds);
     
@@ -426,12 +444,12 @@ void PipeDreamAudioProcessorEditor::resized()
     //main labels
     
     
-//
-//    TitleLabel.setText ("Pipe Dream", juce::dontSendNotification);
-//    TitleLabel.setFont (juce::Font (32.0f, juce::Font::bold));
-//    TitleLabel.setJustificationType (juce::Justification::left);
-//    addAndMakeVisible (TitleLabel);
-//    TitleLabel.setBounds(topPanel.getBounds());
+
+    TitleLabel.setText ("Pipe Dream", juce::dontSendNotification);
+    TitleLabel.setFont (juce::Font (32.0f, juce::Font::bold));
+    TitleLabel.setJustificationType (juce::Justification::centred);
+    addAndMakeVisible (TitleLabel);
+    TitleLabel.setBounds(topPanel.getBounds());
 
 
 
@@ -449,7 +467,6 @@ void PipeDreamAudioProcessorEditor::resized()
     GainLabel.setBounds(GainTitleBounds.removeFromBottom(GainTitleBounds.getHeight() - 5));
          
     //pitch flex box
-     //auto pitchBounds = pitchSelControls.getBounds().reduced(10);
      auto pitchBounds = pitchSelControls.getBounds().removeFromBottom(pitchSelControls.getHeight() - spacerTop).reduced(5);
 
      juce::FlexBox flexBoxpitch;
@@ -457,8 +474,7 @@ void PipeDreamAudioProcessorEditor::resized()
      flexBoxpitch.flexWrap = juce::FlexBox::Wrap::noWrap;
      
      auto spacer = juce::FlexItem().withWidth(2);
-     //auto spacertop = juce::FlexItem().withWidth(10);
-     
+
      flexBoxpitch.items.add(spacer);
      flexBoxpitch.items.add(juce::FlexItem(PitchSel1Slider).withFlex(1.f));
      flexBoxpitch.items.add(spacer);
@@ -474,18 +490,16 @@ void PipeDreamAudioProcessorEditor::resized()
     
      flexBoxpitch.performLayout(pitchBounds);
     
-    //gain flexbox
+//gain flex box
+    
     
     auto gainBounds = gainControls.getBounds().removeFromBottom(gainControls.getHeight() - spacerTop).reduced(5);
-    //auto gainBounds = gainControls.getBounds().reduced(10);
 
-    //gainBounds = gainBounds.re
 
     juce::FlexBox flexBoxgain;
     flexBoxgain.flexDirection = juce::FlexBox::Direction::row;
     flexBoxgain.flexWrap = juce::FlexBox::Wrap::noWrap;
     
-    //auto spacer = juce::FlexItem().withWidth(2);
     
     flexBoxpitch.items.add(spacer);
     flexBoxgain.items.add(juce::FlexItem(GainOut1Slider).withFlex(1.f));
@@ -499,61 +513,102 @@ void PipeDreamAudioProcessorEditor::resized()
     flexBoxgain.items.add(juce::FlexItem(GainOut5Slider).withFlex(1.f));
     flexBoxgain.items.add(spacer);
     
-    
-    
-//    flexBoxgain.items.add(juce::FlexItem().withHeight(15));
-//    flexBoxgain.items.add(juce::FlexItem().withHeight(30));
 
    
     flexBoxgain.performLayout(gainBounds);
-   
-    //chords flexbox
     
-    //auto chordBoundZ = sidePanel.getBounds(); //.removeFromTop(sidePanel.getY()/2).reduced(10);
-    auto chordBounds = sidePanel.getBounds().removeFromTop(sidePanel.getBounds().getHeight()/2).reduced(10);
-    //auto buttonBounds = chordBounds.removeFromTop(30);
-    
-    auto buttonBounds = topPanel.getBounds().removeFromRight(sidePaddingWidth * 3);
+    auto buttonBounds = bottomPanel.getBounds();//.removeFromRight(sidePaddingWidth * 3);
     
     chordHoldButton.setBounds(buttonBounds.removeFromRight(buttonBounds.getWidth()/3).reduced(2));
     LoadButton.setBounds(buttonBounds.removeFromRight(buttonBounds.getWidth()/2).reduced(2));
     IRSelect.setBounds(buttonBounds.reduced(2));
-    //buttonBounds.getX() + buttonBounds.getX() / 2, buttonBounds.getY(), 50, 50)
-    juce::FlexBox flexBoxChords;
-    flexBoxChords.flexDirection = juce::FlexBox::Direction::row;
-    flexBoxChords.flexWrap = juce::FlexBox::Wrap::noWrap;
+   
     
-    flexBoxgain.items.add(spacer);
-    flexBoxChords.items.add(juce::FlexItem(RootSelSlider).withFlex(1.f));
-    flexBoxgain.items.add(spacer);
-    flexBoxChords.items.add(juce::FlexItem(ChordSelSlider).withFlex(1.f));
-    flexBoxgain.items.add(spacer);
-    flexBoxChords.items.add(juce::FlexItem(DecaySlider).withFlex(1.f));
-    flexBoxgain.items.add(spacer);
+    //Right panel
+    int sliderlabelpadding = 30;
+    
+    
+    auto rightBounds = rightPanel.getBounds().reduced(10);
+    auto rightBoundsRow1a = rightBounds.removeFromTop(rightBounds.getHeight()/2);
+    auto rightBoundsRow1 = rightBoundsRow1a.removeFromTop(rightBoundsRow1a.getHeight() - sliderlabelpadding);
+    auto rightBoundsRow2 = rightBounds.removeFromBottom(rightBounds.getHeight() - (sliderlabelpadding - 10));
+    
+    
+    juce::FlexBox RightRow1;
+    RightRow1.flexDirection = juce::FlexBox::Direction::row;
+    RightRow1.flexWrap = juce::FlexBox::Wrap::noWrap;
+    
+    RightRow1.items.add(spacer);
+    RightRow1.items.add(juce::FlexItem(HighPassSlider).withFlex(1.f));
+    RightRow1.items.add(spacer);
+    RightRow1.items.add(juce::FlexItem(LowPassSlider).withFlex(1.f));
+    RightRow1.items.add(spacer);
 
+    RightRow1.performLayout(rightBoundsRow1);
     
-    flexBoxChords.performLayout(chordBounds);
+    juce::FlexBox RightRow2;
+    RightRow2.flexDirection = juce::FlexBox::Direction::row;
+    RightRow2.flexWrap = juce::FlexBox::Wrap::noWrap;
     
-    //filter flexbox
-    
-    auto filterBounds = sidePanel.getBounds().removeFromBottom(sidePanel.getBounds().getHeight()/2).reduced(10);
-    
-    //auto button2Bounds = filterBounds.removeFromTop(30);
-    
-    //buttonBounds.getX() + buttonBounds.getX() / 2, buttonBounds.getY(), 50, 50);
-    juce::FlexBox flexBoxFilter;
-    flexBoxFilter.flexDirection = juce::FlexBox::Direction::row;
-    flexBoxFilter.flexWrap = juce::FlexBox::Wrap::noWrap;
-    
-    flexBoxgain.items.add(spacer);
-    flexBoxFilter.items.add(juce::FlexItem(LowPassSlider).withFlex(1.f));
-    flexBoxgain.items.add(spacer);
-    flexBoxFilter.items.add(juce::FlexItem(HighPassSlider).withFlex(1.f));
-    flexBoxgain.items.add(spacer);
-    flexBoxFilter.items.add(juce::FlexItem(DryWetSlider).withFlex(1.f));
-    flexBoxgain.items.add(spacer);
+    RightRow2.items.add(spacer);
+    RightRow2.items.add(juce::FlexItem(DecaySlider).withFlex(1.f));
+    RightRow2.items.add(spacer);
+    RightRow2.items.add(juce::FlexItem(DryWetSlider).withFlex(1.f));
+    RightRow2.items.add(spacer);
 
-    flexBoxFilter.performLayout(filterBounds);
+    RightRow2.performLayout(rightBoundsRow2);
     
+    //Left panel
+    
+    
+    auto leftBounds = leftPanel.getBounds().reduced(10);
+    auto leftBoundsRow1a = leftBounds.removeFromTop(leftBounds.getHeight()/2);
+    auto leftBoundsRow1 = leftBoundsRow1a.removeFromTop(leftBoundsRow1a.getHeight() - sliderlabelpadding);
+    auto leftBoundsRow2 = leftBounds.removeFromBottom(leftBounds.getHeight() - (sliderlabelpadding - 10));
+    
+    juce::FlexBox LeftRow1;
+    LeftRow1.flexDirection = juce::FlexBox::Direction::row;
+    LeftRow1.flexWrap = juce::FlexBox::Wrap::noWrap;
+    
+    LeftRow1.items.add(spacer);
+    LeftRow1.items.add(juce::FlexItem(RootSelSlider).withFlex(1.f));
+    LeftRow1.items.add(spacer);
+    LeftRow1.items.add(juce::FlexItem(ChordSelSlider).withFlex(1.f));
+    LeftRow1.items.add(spacer);
+
+    LeftRow1.performLayout(leftBoundsRow1);
+    
+    juce::FlexBox LeftRow2;
+    LeftRow2.flexDirection = juce::FlexBox::Direction::row;
+    LeftRow2.flexWrap = juce::FlexBox::Wrap::noWrap;
+    
+    LeftRow2.items.add(spacer);
+    LeftRow2.items.add(juce::FlexItem(GainInMSlider).withFlex(1.f));
+    LeftRow2.items.add(spacer);
+    LeftRow2.items.add(juce::FlexItem(GainOutMSlider).withFlex(1.f));
+    LeftRow2.items.add(spacer);
+
+    LeftRow2.performLayout(leftBoundsRow2);
+    
+    
+//    
+//    //filter flexbox
+//    
+//    auto filterBounds = sidePanel.getBounds().removeFromBottom(sidePanel.getBounds().getHeight()/2).reduced(10);
+//    
+//    juce::FlexBox flexBoxFilter;
+//    flexBoxFilter.flexDirection = juce::FlexBox::Direction::row;
+//    flexBoxFilter.flexWrap = juce::FlexBox::Wrap::noWrap;
+//    
+//    flexBoxgain.items.add(spacer);
+//    flexBoxFilter.items.add(juce::FlexItem(LowPassSlider).withFlex(1.f));
+//    flexBoxgain.items.add(spacer);
+//    flexBoxFilter.items.add(juce::FlexItem(HighPassSlider).withFlex(1.f));
+//    flexBoxgain.items.add(spacer);
+//    flexBoxFilter.items.add(juce::FlexItem(DryWetSlider).withFlex(1.f));
+//    flexBoxgain.items.add(spacer);
+//
+//    flexBoxFilter.performLayout(filterBounds);
+//    
     
 }

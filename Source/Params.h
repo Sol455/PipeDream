@@ -38,7 +38,10 @@ enum Names {
     Low_Pass_Cut_Off,
     High_Pass_Cut_Off,
     
-    IR_select
+    IR_select,
+    
+    Gain_In_Master,
+    Gain_Out_Master
     
     
     
@@ -69,7 +72,12 @@ inline const std::map<Names, juce::String>& GetParams()
         {Low_Pass_Cut_Off, "Low_Pass_Cut_Off"},
         {High_Pass_Cut_Off, "High_Pass_Cut_Off"},
         
-        {IR_select, "IR_select"}
+        {IR_select, "IR_select"},
+        
+        {Gain_In_Master, "Gain_In_Master"},
+        {Gain_Out_Master, "Gain_Out_Master"},
+    
+        
         
     };
     

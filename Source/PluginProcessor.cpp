@@ -67,6 +67,11 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     floatHelper(outGain3, Names::Gain_Out_3);
     floatHelper(outGain4, Names::Gain_Out_4);
     floatHelper(outGain5, Names::Gain_Out_5);
+    
+    
+    floatHelper(GainInM, Names::Gain_In_Master);
+    floatHelper(GainOutM, Names::Gain_Out_Master);
+
     floatHelper(DryWet, Names::Dry_Wet);
     floatHelper(DecayTime, Names::Decay_Time);
     floatHelper(LowPassCutOff, Names::Low_Pass_Cut_Off);
@@ -122,6 +127,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         
         layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Gain_Out_5), 1},
                                                         params.at(Names::Gain_Out_5),
+                                                        gainRange,
+                                                        0 ));
+        
+        
+        //master gain
+        layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Gain_In_Master), 1},
+                                                        params.at(Names::Gain_In_Master),
+                                                        gainRange,
+                                                        0 ));
+        
+        layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Gain_Out_Master), 1},
+                                                        params.at(Names::Gain_Out_Master),
                                                         gainRange,
                                                         0 ));
        
@@ -563,14 +580,12 @@ void PipeDreamAudioProcessor::setCurrentIR(int voiceNumber) {
     
     auto currentBufferSel = apvts.getRawParameterValue("IR_select");
     int currentBufferArrary = static_cast<int>(currentBufferSel->load());
-    
-    std::cout << currentBufferArrary;
-    
+        
     auto currentPitch  = pitchIDArray[voiceNumber]->get() + 12;
     
     
     
-    bufferTransfers[voiceNumber].set(BufferWithSampleRate {std::move (BufferStoreArray[currentBufferArrary].BufBankReadP(currentPitch)),
+        bufferTransfers[voiceNumber].set(BufferWithSampleRate {std::move (BufferStoreArray[currentBufferArrary].BufBankReadP(currentPitch)),
         BufferStoreArray[currentBufferArrary].GetSampleRate(currentPitch)});
 }
 

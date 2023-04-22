@@ -158,6 +158,9 @@ private:
     
     juce::AudioParameterChoice* IRSelect {nullptr};
     
+    juce::AudioParameterFloat* GainInM {nullptr};
+    juce::AudioParameterFloat* GainOutM {nullptr};
+    
     //juce::dsp::LinkwitzRileyFilterType::lowpass
     
     juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter <float>, juce::dsp::IIR::Coefficients <float>> lowPassFilter;
