@@ -60,11 +60,11 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     //===================================
-    void readIRFromFile(int IRNum, int IRtoWrite);
+    void readIRFromFile(int IRNum, int bufferBankID);
     //void rePitchBuffer(int test);
     //void repitchBuffer(juce::AudioFormatReader* reader, int bufferNum);
-    void repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitone);
-    void normaliseAndTrim(int bufferNum);
+    void repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitone, int bufferBankID);
+    void normaliseAndTrim(int bufferBankID, int bufferNum);
     void updateCurrentIRs();
     void setCurrentIRs();
     void setDecay(int bufferNum);
@@ -72,7 +72,7 @@ public:
     void updateFilters();
     void updateDecayTime(int voiceNumber);
     void computeChords();
-
+    void loadUserIR();
 
     
     juce::AudioProcessorValueTreeState apvts;
@@ -100,8 +100,11 @@ public:
     
     juce::String FilePath = getPathtoIRFolder();
 
-    BufferStore bufferStore;
-    BufferStore referenceBuffers;
+    //BufferStore bufferStore
+    
+    std::array<BufferStore, 4> BufferStoreArray;
+    std::array<BufferStore, 4> referenceBufferStoreArray;
+    //BufferStore referenceBuffers;
     
     juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
     
@@ -152,6 +155,8 @@ private:
     
     juce::AudioParameterFloat* LowPassCutOff {nullptr};
     juce::AudioParameterFloat* HighPassCutOff {nullptr};
+    
+    juce::AudioParameterChoice* IRSelect {nullptr};
     
     //juce::dsp::LinkwitzRileyFilterType::lowpass
     

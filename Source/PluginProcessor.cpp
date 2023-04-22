@@ -74,6 +74,7 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     
     choiceHelper(ChordSel, Names::Chord_Sel);
     choiceHelper(rootSel, Names::Root_Sel);
+    choiceHelper(IRSelect, Names::IR_select);
     
     boolHelper(ChordHold, Names::Chord_Hold);
     
@@ -186,6 +187,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout
                                                         params.at(Names::Dry_Wet),
                                                         dryWetRange,
                                                         0.5 ));
+        
+        //IR select
+        juce::StringArray IRSelectOptions = {"PVC","Glass","Metal","User"};
+        
+        layout.add(std::make_unique<AudioParameterChoice>(ParameterID {params.at(Names::IR_select), 1},
+                                                          params.at(Names::IR_select),
+                                                          IRSelectOptions,
+                                                          0));
+        
         
         //Decay
         
@@ -312,9 +322,13 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     
 }
     
-void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
+void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferBankID) {
     
-    currentIR = FilePath + IRNames[IRNum];
+    if (IRNum != 4) {
+        currentIR = FilePath + IRNames[IRNum];
+    } else {
+        currentIR = UserIRFilePath.getValue().toString();
+    }
     
     if(currentIR.existsAsFile())
     {
@@ -329,43 +343,43 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
         }
         
         //trim buffer below 1sec
-        repitchBuffer(reader, 0, -12);
-        repitchBuffer(reader, 1, -11);
-        repitchBuffer(reader, 2, -10);
-        repitchBuffer(reader, 3, -9);
-        repitchBuffer(reader, 4, -8);
-        repitchBuffer(reader, 5, -7);
-        repitchBuffer(reader, 6, -6);
-        repitchBuffer(reader, 7, -5);
-        repitchBuffer(reader, 8, -4);
-        repitchBuffer(reader, 9, -3);
-        repitchBuffer(reader, 10, -2);
-        repitchBuffer(reader, 11, -1);
-        repitchBuffer(reader, 12, 0);
-        repitchBuffer(reader, 13, 1);
-        repitchBuffer(reader, 14, 2);
-        repitchBuffer(reader, 15, 3);
-        repitchBuffer(reader, 16, 4);
-        repitchBuffer(reader, 17, 5);
-        repitchBuffer(reader, 18, 6);
-        repitchBuffer(reader, 19, 7);
-        repitchBuffer(reader, 20, 8);
-        repitchBuffer(reader, 21, 9);
-        repitchBuffer(reader, 22, 10);
-        repitchBuffer(reader, 23, 11);
-        repitchBuffer(reader, 24, 12);
-        repitchBuffer(reader, 25, 13);
-        repitchBuffer(reader, 26, 14);
-        repitchBuffer(reader, 27, 15);
-        repitchBuffer(reader, 28, 16);
-        repitchBuffer(reader, 29, 17);
-        repitchBuffer(reader, 30, 18);
-        repitchBuffer(reader, 31, 19);
-        repitchBuffer(reader, 32, 20);
-        repitchBuffer(reader, 33, 21);
-        repitchBuffer(reader, 34, 22);
-        repitchBuffer(reader, 35, 23);
-        repitchBuffer(reader, 36, 24);
+        repitchBuffer(reader, 0, -12, bufferBankID);
+        repitchBuffer(reader, 1, -11, bufferBankID);
+        repitchBuffer(reader, 2, -10, bufferBankID);
+        repitchBuffer(reader, 3, -9, bufferBankID);
+        repitchBuffer(reader, 4, -8, bufferBankID);
+        repitchBuffer(reader, 5, -7, bufferBankID);
+        repitchBuffer(reader, 6, -6, bufferBankID);
+        repitchBuffer(reader, 7, -5, bufferBankID);
+        repitchBuffer(reader, 8, -4, bufferBankID);
+        repitchBuffer(reader, 9, -3, bufferBankID);
+        repitchBuffer(reader, 10, -2, bufferBankID);
+        repitchBuffer(reader, 11, -1, bufferBankID);
+        repitchBuffer(reader, 12, 0, bufferBankID);
+        repitchBuffer(reader, 13, 1, bufferBankID);
+        repitchBuffer(reader, 14, 2, bufferBankID);
+        repitchBuffer(reader, 15, 3, bufferBankID);
+        repitchBuffer(reader, 16, 4, bufferBankID);
+        repitchBuffer(reader, 17, 5, bufferBankID);
+        repitchBuffer(reader, 18, 6, bufferBankID);
+        repitchBuffer(reader, 19, 7, bufferBankID);
+        repitchBuffer(reader, 20, 8, bufferBankID);
+        repitchBuffer(reader, 21, 9, bufferBankID);
+        repitchBuffer(reader, 22, 10, bufferBankID);
+        repitchBuffer(reader, 23, 11, bufferBankID);
+        repitchBuffer(reader, 24, 12, bufferBankID);
+        repitchBuffer(reader, 25, 13, bufferBankID);
+        repitchBuffer(reader, 26, 14, bufferBankID);
+        repitchBuffer(reader, 27, 15, bufferBankID);
+        repitchBuffer(reader, 28, 16, bufferBankID);
+        repitchBuffer(reader, 29, 17, bufferBankID);
+        repitchBuffer(reader, 30, 18, bufferBankID);
+        repitchBuffer(reader, 31, 19, bufferBankID);
+        repitchBuffer(reader, 32, 20, bufferBankID);
+        repitchBuffer(reader, 33, 21, bufferBankID);
+        repitchBuffer(reader, 34, 22, bufferBankID);
+        repitchBuffer(reader, 35, 23, bufferBankID);
+        repitchBuffer(reader, 36, 24, bufferBankID);
         
 //        for (int i = 0; i < 12; i ++) {
 //            repitchBuffer(reader, i, (-12 + i));
@@ -379,7 +393,7 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
 //            repitchBuffer(reader, 5, 200000, 3);
         
         for (int i = 0; i < 37; i++) {
-            normaliseAndTrim(i);
+            normaliseAndTrim(bufferBankID, i);
         }
         std::cout << "\n\nDONE!!\n\n";
          delete reader;
@@ -388,15 +402,15 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferNum) {
     }
 }
 
-void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitoneIn) {
+void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitoneIn, int bufferBankID) {
     
     float semitoneToPhase;
     semitoneToPhase = pow(2.0, semitoneIn/12.0);
     
     juce::AudioSampleBuffer temp;
     //1. clear buffers
-    bufferStore.BufBankReadP(bufferNum).clear();
-    referenceBuffers.BufBankReadP(bufferNum).clear();
+    BufferStoreArray[bufferBankID].BufBankReadP(bufferNum).clear();
+    referenceBufferStoreArray[bufferBankID].BufBankReadP(bufferNum).clear();
 
     temp.clear();
     
@@ -404,8 +418,8 @@ void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int
 
     //2. set buffer Sizes
     temp.setSize((int)reader->numChannels, (int)reader->lengthInSamples);
-    bufferStore.SetBufferSize(bufferNum, static_cast<int> (reader->numChannels), (static_cast<int>(reader->lengthInSamples)/ ratio));
-    referenceBuffers.SetBufferSize(bufferNum, static_cast<int> (reader->numChannels), (static_cast<int>(reader->lengthInSamples)/ ratio));
+    BufferStoreArray[bufferBankID].SetBufferSize(bufferNum, static_cast<int> (reader->numChannels), (static_cast<int>(reader->lengthInSamples)/ ratio));
+    referenceBufferStoreArray[bufferBankID].SetBufferSize(bufferNum, static_cast<int> (reader->numChannels), (static_cast<int>(reader->lengthInSamples)/ ratio));
     
     //3. read file into tempory buffer
     reader->read(&temp, 0, static_cast<int>(reader->lengthInSamples), 0, true, true);
@@ -416,18 +430,18 @@ void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int
                 for (int i = 0; i < reader->numChannels; i++) {
                     iResult = interpolator.process(ratio,
                         temp.getReadPointer(i),
-                        bufferStore.BufBankBufferWriteP1(bufferNum, i),
-                        bufferStore.getSamples(bufferNum));
+                        BufferStoreArray[bufferBankID].BufBankBufferWriteP1(bufferNum, i),
+                        BufferStoreArray[bufferBankID].getSamples(bufferNum));
                 }
     
-     bufferStore.SetSampleRate(bufferNum, reader->sampleRate);
-     referenceBuffers.SetSampleRate(bufferNum, reader->sampleRate);
+     BufferStoreArray[bufferBankID].SetSampleRate(bufferNum, reader->sampleRate);
+     referenceBufferStoreArray[bufferBankID].SetSampleRate(bufferNum, reader->sampleRate);
 }
 
-void PipeDreamAudioProcessor::normaliseAndTrim(int bufferNum) {
+void PipeDreamAudioProcessor::normaliseAndTrim(int bufferBankID, int bufferNum) {
 
         //trim
-        int numSamples = bufferStore.getSamples(bufferNum);
+        int numSamples = BufferStoreArray[bufferBankID].getSamples(bufferNum);
         int blockSize = static_cast<int>(std::floor(this->getSampleRate()) / 100);
         int endBlockNum = numSamples / blockSize;
         //std::cout << "\nOrigional Length:" << numSamples;
@@ -435,7 +449,7 @@ void PipeDreamAudioProcessor::normaliseAndTrim(int bufferNum) {
         float localMaxMagnitude = 0.0f;
         while ((endBlockNum - 1) * blockSize > 0) {
             --endBlockNum;
-            localMaxMagnitude = bufferStore.BufBankReadP(bufferNum).getMagnitude(endBlockNum * blockSize, blockSize);
+            localMaxMagnitude = BufferStoreArray[bufferBankID].BufBankReadP(bufferNum).getMagnitude(endBlockNum * blockSize, blockSize);
             if (localMaxMagnitude > 0.001) {
                 break;
             }
@@ -443,21 +457,37 @@ void PipeDreamAudioProcessor::normaliseAndTrim(int bufferNum) {
         
     int trimmedNumSamples = endBlockNum * blockSize - 1;
     //std::cout << "\ntrimmed length :" << trimmedNumSamples;
-    int numChannels =  bufferStore.getChannels(bufferNum);
-    bufferStore.SetInfo1(bufferNum, numChannels, trimmedNumSamples);
+    int numChannels =  BufferStoreArray[bufferBankID].getChannels(bufferNum);
+    BufferStoreArray[bufferBankID].SetInfo1(bufferNum, numChannels, trimmedNumSamples);
     
     //normalize
-    float MaxMagnitude = bufferStore.BufBankReadP(bufferNum).getMagnitude(0, bufferStore.getSamples(bufferNum));
-    bufferStore.BufBankReadP(bufferNum).applyGain(1.0f / (MaxMagnitude + 0.01));
+    float MaxMagnitude = BufferStoreArray[bufferBankID].BufBankReadP(bufferNum).getMagnitude(0, BufferStoreArray[bufferBankID].getSamples(bufferNum));
+    BufferStoreArray[bufferBankID].BufBankReadP(bufferNum).applyGain(1.0f / (MaxMagnitude + 0.01));
     std::cout << "\nBufStore BUFFER MAG:"<< MaxMagnitude;
     
     //copy to refernce buffers
-    auto currentBuffer = bufferStore.BufBankReadP(bufferNum);
+    auto currentBuffer = BufferStoreArray[bufferBankID].BufBankReadP(bufferNum);
     
-    referenceBuffers.makecopy(bufferNum, currentBuffer);
+    referenceBufferStoreArray[bufferBankID].makecopy(bufferNum, currentBuffer);
     
-    float MaxMagnitudeRef = referenceBuffers.BufBankReadP(bufferNum).getMagnitude(0, referenceBuffers.getSamples(bufferNum));    
+    float MaxMagnitudeRef = referenceBufferStoreArray[bufferBankID].BufBankReadP(bufferNum).getMagnitude(0, referenceBufferStoreArray[bufferBankID].getSamples(bufferNum));
     std::cout << "\RefBuffer BUFFER MAG:"<< MaxMagnitudeRef;
+}
+
+void PipeDreamAudioProcessor::loadUserIR() {
+    //1. open reader on file
+    //IR number = 4
+    readIRFromFile(4, 3); //read user IR (4) to buffer bank number 3
+    
+    setCurrentIRs();
+    setDecay(pitchsel1->get());
+    setDecay(pitchsel2->get());
+    setDecay(pitchsel3->get());
+    setDecay(pitchsel4->get());
+    setDecay(pitchsel5->get());
+    
+    
+    
 }
 
 void PipeDreamAudioProcessor::releaseResources()
@@ -512,21 +542,6 @@ void PipeDreamAudioProcessor::updateCurrentIRs() {
 
 void PipeDreamAudioProcessor::setCurrentIRs() {
     
-//    std::array<int, 5> pitches;
-//
-//    pitches = {
-//        pitchsel1->get() + 12,
-//        pitchsel2->get() + 12,
-//        pitchsel3->get() + 12,
-//        pitchsel4->get() + 12,
-//        pitchsel5->get() + 12
-//    };
-//
-//    for (int i = 0; i < 5; i++){
-//        bufferTransfers[i].set(BufferWithSampleRate {std::move (bufferStore.BufBankReadP(pitches[i])),
-//            bufferStore.GetSampleRate(pitches[i])});
-//    }
-    
     for (int i=0; i < 5; i ++) {
         setCurrentIR(i);
     }
@@ -545,35 +560,45 @@ void PipeDreamAudioProcessor::setCurrentIR(int voiceNumber) {
         pitchsel5
     };
     
+    auto currentBufferSel = apvts.getRawParameterValue("IR_select");
+    int currentBufferArrary = static_cast<int>(currentBufferSel->load());
+    
+    std::cout << currentBufferArrary;
+    
     auto currentPitch  = pitchIDArray[voiceNumber]->get() + 12;
     
     
-    bufferTransfers[voiceNumber].set(BufferWithSampleRate {std::move (bufferStore.BufBankReadP(currentPitch)),
-        bufferStore.GetSampleRate(currentPitch)});
+    
+    bufferTransfers[voiceNumber].set(BufferWithSampleRate {std::move (BufferStoreArray[currentBufferArrary].BufBankReadP(currentPitch)),
+        BufferStoreArray[currentBufferArrary].GetSampleRate(currentPitch)});
 }
 
 
 
 void PipeDreamAudioProcessor::setDecay(int bufferNum) {
+    //change buffer store array
+    
+    auto currentBufferSel = apvts.getRawParameterValue("IR_select");
+    int currentBufferArrary = static_cast<int>(currentBufferSel->load());
     
     auto decayTimeValue = DecayTime->get();//.apvts.getRawParameterValue("Decay_Time");
     
-    int decaySample = static_cast<int>(std::round(decayTimeValue* referenceBuffers.GetSampleRate(bufferNum)));
+    int decaySample = static_cast<int>(std::round(decayTimeValue* referenceBufferStoreArray[currentBufferArrary].GetSampleRate(bufferNum)));
 
-      double stretchRatio = referenceBuffers.getSamples(bufferNum) / static_cast<double>(decaySample);
+      double stretchRatio = referenceBufferStoreArray[currentBufferArrary].getSamples(bufferNum) / static_cast<double>(decaySample);
     
     
       juce::AudioBuffer<float> temp;
 
-      int numChannels = referenceBuffers.getChannels(bufferNum);
+      int numChannels = referenceBufferStoreArray[currentBufferArrary].getChannels(bufferNum);
       soundtouch.setTempo(stretchRatio);
 
       temp.setSize(numChannels, decaySample, false, true, false);
 
     
       for (int channel = 0; channel < numChannels; ++channel) {
-        soundtouch.putSamples(referenceBuffers.BufBankBufferReadP1(bufferNum, channel),
-                              referenceBuffers.getSamples(bufferNum));
+        soundtouch.putSamples(referenceBufferStoreArray[currentBufferArrary].BufBankBufferReadP1(bufferNum, channel),
+                              referenceBufferStoreArray[currentBufferArrary].getSamples(bufferNum));
           
         soundtouch.receiveSamples(temp.getWritePointer(channel),
                                   decaySample);
@@ -581,7 +606,7 @@ void PipeDreamAudioProcessor::setDecay(int bufferNum) {
       }
     
     //bufferStore.BufBankBufferWriteP1(bufferNum, channel) //pointer switch
-    bufferStore.makecopy(bufferNum, temp);
+    BufferStoreArray[currentBufferArrary].makecopy(bufferNum, temp);
     //setCurrentIR(bufferNum);
 }
 

@@ -40,6 +40,8 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
                 audioProcessor.UserIRFilePath.setValue(audioProcessor.savedFile.getFullPathName());
                 std::cout << audioProcessor.UserIRFilePath.getValue().toString();
                 
+                audioProcessor.loadUserIR();
+                
                 //variableTree.setProperty("FilePath2", "WAG1", nullptr);
                 //audioProcessor.variableTree.setProperty("Root", audioProcessor.savedFile.getParentDirectory().getFullPathName(), nullptr);
                 //audioProcessor.conv1.reset();
@@ -223,6 +225,9 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     //PitchSel5Slider.on
     
     addAndMakeVisible (IRSelect);
+    IRSelectAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "IR_select", IRSelect);
+
+    //IRsel
     IRSelect.addItem ("PVC",  1);
     IRSelect.addItem ("Glass",   2);
     IRSelect.addItem ("Metal", 3);
@@ -238,6 +243,14 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
 }
 
 void PipeDreamAudioProcessorEditor::IRChanged() {
+    //auto IRchange = audioProcessor.apvts.getRawParameterValue("IR_select");
+    //int IRchanged = static_cast<int>(IRchange->load());
+    audioProcessor.setCurrentIRs();
+    for (int i = 0; i < 5; i ++) {
+        audioProcessor.setDecay(i);
+    }
+    
+    //std::cout << IRchanged;
     
 }
 

@@ -36,7 +36,9 @@ enum Names {
     Decay_Time,
     
     Low_Pass_Cut_Off,
-    High_Pass_Cut_Off
+    High_Pass_Cut_Off,
+    
+    IR_select
     
     
     
@@ -65,7 +67,9 @@ inline const std::map<Names, juce::String>& GetParams()
         {Decay_Time, "Decay_Time"},
         
         {Low_Pass_Cut_Off, "Low_Pass_Cut_Off"},
-        {High_Pass_Cut_Off, "High_Pass_Cut_Off"}
+        {High_Pass_Cut_Off, "High_Pass_Cut_Off"},
+        
+        {IR_select, "IR_select"}
         
     };
     

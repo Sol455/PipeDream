@@ -110,6 +110,8 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> ChordSelAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> RootSelAttachment;
     
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> IRSelectAttachment;
+    
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;
     juce::Label irName;
