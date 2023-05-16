@@ -67,8 +67,6 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     floatHelper(outGain3, Names::Gain_Out_3);
     floatHelper(outGain4, Names::Gain_Out_4);
     floatHelper(outGain5, Names::Gain_Out_5);
-    
-    
     floatHelper(GainInM, Names::Gain_In_Master);
     floatHelper(GainOutM, Names::Gain_Out_Master);
 
@@ -84,7 +82,50 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     boolHelper(ChordHold, Names::Chord_Hold);
     
     UserIRFilePath = apvts.state.getPropertyAsValue("UserIRFilePath", nullptr, true);
-
+    
+    //parameter attachments
+    pitchSel1PA.attachToParameter(apvts.getParameter("Pitch_Sel_1"));
+    pitchSel1PA.onParameterChanged = [&] {
+        setCurrentIR(0);
+        updateDecayTime(0);
+    };
+    
+    pitchSel2PA.attachToParameter(apvts.getParameter("Pitch_Sel_2"));
+    pitchSel2PA.onParameterChanged = [&] {
+        setCurrentIR(1);
+        updateDecayTime(1);
+    };
+    
+    pitchSel3PA.attachToParameter(apvts.getParameter("Pitch_Sel_3"));
+    pitchSel3PA.onParameterChanged = [&] {
+        setCurrentIR(2);
+        updateDecayTime(2);
+    };
+    
+    pitchSel4PA.attachToParameter(apvts.getParameter("Pitch_Sel_4"));
+    pitchSel4PA.onParameterChanged = [&] {
+        setCurrentIR(3);
+        updateDecayTime(4);
+    };
+    
+    pitchSel5PA.attachToParameter(apvts.getParameter("Pitch_Sel_5"));
+    pitchSel5PA.onParameterChanged = [&] {
+        setCurrentIR(4);
+        updateDecayTime(4);
+    };
+    
+    
+    chordSelPA.attachToParameter(apvts.getParameter("Chord_Sel"));
+    chordSelPA.onParameterChanged = [&] {
+        startTimer(20);
+    };
+    
+    RootSelPA.attachToParameter(apvts.getParameter("Root_Sel"));
+    RootSelPA.onParameterChanged = [&] {
+        startTimer(20);
+    };
+    
+    
 }
 
 PipeDreamAudioProcessor::~PipeDreamAudioProcessor()
@@ -216,7 +257,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         
         //Decay
         
-        auto decayRange = NormalisableRange<float>(0.1f, 2.f, 0.01);
+        auto decayRange = NormalisableRange<float>(0.1f, 3.f, 0.01);
 
         
         layout.add(std::make_unique<juce::AudioParameterFloat>(ParameterID {params.at(Names::Decay_Time), 1},
@@ -233,13 +274,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout
                                                              params.at(Names::High_Pass_Cut_Off),
                                                              NormalisableRange<float>(30, 20000, 1, 1), 50));
         
+        
+        
+        
         return layout;
 }
 
 void PipeDreamAudioProcessor::parameterChanged(const juce::String &parameterID, float newValue)
 {
+    std::cout << "\nARAMY\n\n";
     
 }
+
 
 
 //==============================================================================
@@ -674,6 +720,39 @@ void PipeDreamAudioProcessor::updateFilters() {
     
 }
 
+void PipeDreamAudioProcessor::computeChords() {
+    //int currentChord = ChordSel->getCurrentChoiceName().getIntValue();
+    auto ChordSel = apvts.getRawParameterValue("Chord_Sel");
+    int currentChord = static_cast<int>(ChordSel->load());
+    
+    auto offsetSel = apvts.getRawParameterValue("Root_Sel");
+    int offset = static_cast<int>(offsetSel->load());
+    
+    //set to current pitch firdt
+    //1 change parameter 2, update current IR to match parameter, configure decay, re-write
+    
+    apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
+    apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_1")->convertTo0to1(chordArray[currentChord][0] + offset - 12));
+    apvts.getParameter("Pitch_Sel_1")->endChangeGesture(); 
+
+    apvts.getParameter("Pitch_Sel_2")->beginChangeGesture();
+    apvts.getParameter("Pitch_Sel_2")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_2")->convertTo0to1(chordArray[currentChord][1]+ offset - 12)) ;
+    apvts.getParameter("Pitch_Sel_2")->endChangeGesture();
+
+    apvts.getParameter("Pitch_Sel_3")->beginChangeGesture();
+    apvts.getParameter("Pitch_Sel_3")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_3")->convertTo0to1(chordArray[currentChord][2]+ offset - 12)) ;
+    apvts.getParameter("Pitch_Sel_3")->endChangeGesture();
+
+    apvts.getParameter("Pitch_Sel_4")->beginChangeGesture();
+    apvts.getParameter("Pitch_Sel_4")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_4")->convertTo0to1(chordArray[currentChord][3]+ offset - 12) );
+    apvts.getParameter("Pitch_Sel_4")->endChangeGesture();
+
+    apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
+    apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_5")->convertTo0to1(chordArray[currentChord][4]+ offset - 12) );
+    apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
+
+}
+
 
 void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
@@ -724,34 +803,6 @@ void PipeDreamAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     //out gain
     outputGainM.process(conteky);
     
-    
-
-    
-
-    
-    
-
-//    // In case we have more outputs than inputs, this code clears any output
-//    // channels that didn't contain input data, (because these aren't
-//    // guaranteed to be empty - they may contain garbage).
-//    // This is here to avoid people getting screaming feedback
-//    // when they first compile a plugin, but obviously you don't need to keep
-//    // this code if your algorithm always overwrites all the output channels.
-//    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-//        buffer.clear (i, 0, buffer.getNumSamples());
-//
-//    // This is the place where you'd normally do the guts of your plugin's
-//    // audio processing...
-//    // Make sure to reset the state if your inner loop is processing
-//    // the samples and the outer loop is handling the channels.
-//    // Alternatively, you can process the samples with the channels
-//    // interleaved by keeping the same state.
-//    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-//    {
-//        auto* channelData = buffer.getWritePointer (channel);
-//
-//        // ..do something to the data...
-//    }
 }
 
 //==============================================================================
@@ -764,6 +815,15 @@ juce::AudioProcessorEditor* PipeDreamAudioProcessor::createEditor()
 {
     return new PipeDreamAudioProcessorEditor (*this);
 }
+
+void PipeDreamAudioProcessor::timerCallback() {
+    //computeChords();
+    //std::cout << "CALL!\n";
+    computeChords();
+    stopTimer();
+}
+
+
 
 //==============================================================================
 void PipeDreamAudioProcessor::getStateInformation (juce::MemoryBlock& destData)

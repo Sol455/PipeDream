@@ -26,7 +26,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     void computeHeldChords();
-    void computeChords();
+    //void computeChords();
     void updateDecayTime(int voiceNumber);
     void makeSlider(juce::Slider &slider, juce::String textValueSuffix);
     void makeLabel(juce::Label &label, juce::String text, juce::Component *slider);
@@ -39,17 +39,17 @@ private:
     
     juce::CustomStyle customStyle;
     
-    int chordArray[9][5] = {
-        {0, 0, 0, 0, 0}, // Mono
-        {0, 0, 0, 7, 7}, // 5th
-        {0, 0, 2, 2, 7}, // Sus2
-        {0, 0, 3, 3, 7}, // Minor
-        {0, 0, 4, 4, 7}, // Major
-        {0, 0, 5, 5, 7}, // sus4
-        {0, 4, 4, 7, 11}, // Maj7
-        {0, 3, 3, 7, 11}, // min7
-        {0, 0, 7, 9, 9} // 7sus
-    };
+//    int chordArray[9][5] = {
+//        {0, 0, 0, 0, 0}, // Mono
+//        {0, 0, 0, 7, 7}, // 5th
+//        {0, 0, 2, 2, 7}, // Sus2
+//        {0, 0, 3, 3, 7}, // Minor
+//        {0, 0, 4, 4, 7}, // Major
+//        {0, 0, 5, 5, 7}, // sus4
+//        {0, 4, 4, 7, 11}, // Maj7
+//        {0, 3, 3, 7, 11}, // min7
+//        {0, 0, 7, 9, 9} // 7sus
+//    };
     
     std::array<int, 5> HeldChordValues;
     //std::array<int, 5> currentChordValues;

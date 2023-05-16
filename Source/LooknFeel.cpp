@@ -25,7 +25,7 @@ CustomStyle::CustomStyle() {
 //  auto sliderOutlineColour = Colour::fromRGB(222, 186, 157);
     
     
-    auto backgroundColour = Colour::fromRGB(255, 247, 230);
+    auto backgroundColour = Colour::fromRGB(50, 247, 230);
     auto normalTextColour = Colour::fromRGB(111, 76, 91);
     auto lightTextColour = Colour::fromRGB(153, 102, 0);
     auto buttonColour = Colour::fromRGB(153, 102, 0);

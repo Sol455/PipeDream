@@ -15,12 +15,13 @@
 #include "Params.h"
 #include "ParallelProcessors.h"
 #include "../SoundTouch/ea_soundtouch/ea_soundtouch.h"
+#include "ParamAttachHelper.h"
 //#include "ea_soundtouch.h"
 
 //==============================================================================
 /**
 */
-class PipeDreamAudioProcessor  : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener
+class PipeDreamAudioProcessor  : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener, public juce::Timer
 {
 public:
     //==============================================================================
@@ -73,6 +74,9 @@ public:
     void updateDecayTime(int voiceNumber);
     void computeChords();
     void loadUserIR();
+    void timerCallback() override;
+    static void callAfterDelay();
+    //virtual void timerCallback ()=0;
 
     
     juce::AudioProcessorValueTreeState apvts;
@@ -126,8 +130,10 @@ public:
     juce::dsp::DryWetMixer<float> dry_wet_mixer;
     
     juce::Value UserIRFilePath = apvts.state.getPropertyAsValue("UserIRFilePath", nullptr, true);
-
-
+    
+   // using namespace
+    
+    
 
 
 private:
@@ -162,11 +168,10 @@ private:
     juce::AudioParameterFloat* GainOutM {nullptr};
     juce::dsp::Gain<float> inputGainM, outputGainM;
     
-    //juce::dsp::LinkwitzRileyFilterType::lowpass
-    
     juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter <float>, juce::dsp::IIR::Coefficients <float>> lowPassFilter;
     juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter <float>, juce::dsp::IIR::Coefficients <float>> highPassFilter;
     
+
     
     std::array<juce::dsp::Gain<float>, 5> outGains;
     
@@ -174,22 +179,34 @@ private:
     
     std::array<juce::AudioBuffer<float>, 5> bufferCache;
     
-    //juce::dsp::Gain<float> testGain;
+    //Parameter listeners & helpers
+    foleys::ParameterAttachment<int> pitchSel1PA;
+    foleys::ParameterAttachment<int> pitchSel2PA;
+    foleys::ParameterAttachment<int> pitchSel3PA;
+    foleys::ParameterAttachment<int> pitchSel4PA;
+    foleys::ParameterAttachment<int> pitchSel5PA;
+    
+    foleys::ParameterAttachment<int> chordSelPA;
+    foleys::ParameterAttachment<int> RootSelPA;
     
     
+    
+    
+    //ParameterAttachment gain { apvts };
+    
+    
+    int chordArray[9][5] = {
+        {0, 0, 0, 0, 0}, // Mono
+        {0, 0, 0, 7, 7}, // 5th
+        {0, 0, 2, 2, 7}, // Sus2
+        {0, 0, 3, 3, 7}, // Minor
+        {0, 0, 4, 4, 7}, // Major
+        {0, 0, 5, 5, 7}, // sus4
+        {0, 4, 4, 7, 11}, // Maj7
+        {0, 3, 3, 7, 11}, // min7
+        {0, 0, 7, 9, 9} // 7sus
+    };
 
-    
-    
-    
-    //std::array<int>, 5, 9> chordArray;
-    
-
-    //"Mono","5th","Sus2","Minor","Maj","Sus4","Maj7","min7","7sus"
-    
-    
-
-    //juce::AudioParameterFloat* midHighCrossover {nullptr};
-    
     juce::dsp::ProcessSpec spec;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::ValueTree variableTree {"variableTree"};
