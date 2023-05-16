@@ -62,8 +62,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
     //===================================
     void readIRFromFile(int IRNum, int bufferBankID);
-    //void rePitchBuffer(int test);
-    //void repitchBuffer(juce::AudioFormatReader* reader, int bufferNum);
+    void readIRFromBinary(int IRNum, int bufferBankID);
     void repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitone, int bufferBankID);
     void normaliseAndTrim(int bufferBankID, int bufferNum);
     void updateCurrentIRs();
@@ -75,7 +74,7 @@ public:
     void computeChords();
     void loadUserIR();
     void timerCallback() override;
-    static void callAfterDelay();
+    void computeHeldChords();
     //virtual void timerCallback ()=0;
 
     
@@ -92,26 +91,9 @@ public:
     
     juce::AudioSampleBuffer fileBuffer;
     
-    
-    static juce::String getPathtoIRFolder()
-    {
-        if((juce::SystemStats::getOperatingSystemType() & juce::SystemStats::MacOSX) != 0)
-        {
-            return juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonApplicationDataDirectory).getFullPathName() + "/Application Support/PipeDream/IRs/";
-        }
-        return "";
-    }
-    
-    juce::String FilePath = getPathtoIRFolder();
-
-    //BufferStore bufferStore
-    
     std::array<BufferStore, 4> BufferStoreArray;
     std::array<BufferStore, 4> referenceBufferStoreArray;
-    //BufferStore referenceBuffers;
-    
-    juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
-    
+
     //split buffers (prep for filtering)
     std::array<juce::AudioBuffer<float>, 5> audioSplitBuffers;
     
@@ -131,13 +113,11 @@ public:
     
     juce::Value UserIRFilePath = apvts.state.getPropertyAsValue("UserIRFilePath", nullptr, true);
     
-   // using namespace
-    
-    
+    // using namespace
+    std::array<int, 5> HeldChordValues;
 
 
 private:
-    //==============================================================================
     
     juce::AudioParameterInt* pitchsel1 {nullptr};
     juce::AudioParameterInt* pitchsel2 {nullptr};
@@ -153,15 +133,12 @@ private:
     
     juce::AudioParameterChoice* ChordSel {nullptr};
     juce::AudioParameterChoice* rootSel {nullptr};
-    
     juce::AudioParameterBool* ChordHold {nullptr};
     
     juce::AudioParameterFloat* DryWet {nullptr};
     juce::AudioParameterFloat* DecayTime {nullptr};
-    
     juce::AudioParameterFloat* LowPassCutOff {nullptr};
     juce::AudioParameterFloat* HighPassCutOff {nullptr};
-    
     juce::AudioParameterChoice* IRSelect {nullptr};
     
     juce::AudioParameterFloat* GainInM {nullptr};
@@ -171,7 +148,6 @@ private:
     juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter <float>, juce::dsp::IIR::Coefficients <float>> lowPassFilter;
     juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter <float>, juce::dsp::IIR::Coefficients <float>> highPassFilter;
     
-
     
     std::array<juce::dsp::Gain<float>, 5> outGains;
     
@@ -185,15 +161,9 @@ private:
     foleys::ParameterAttachment<int> pitchSel3PA;
     foleys::ParameterAttachment<int> pitchSel4PA;
     foleys::ParameterAttachment<int> pitchSel5PA;
-    
     foleys::ParameterAttachment<int> chordSelPA;
     foleys::ParameterAttachment<int> RootSelPA;
-    
-    
-    
-    
-    //ParameterAttachment gain { apvts };
-    
+    foleys::ParameterAttachment<bool> ChordHoldPA;
     
     int chordArray[9][5] = {
         {0, 0, 0, 0, 0}, // Mono
@@ -206,6 +176,8 @@ private:
         {0, 3, 3, 7, 11}, // min7
         {0, 0, 7, 9, 9} // 7sus
     };
+    
+    bool lockFlag = false;
 
     juce::dsp::ProcessSpec spec;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

@@ -43,33 +43,6 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
         });
     };
     
-//    ChordSelSlider.onDragEnd = [this]()
-//    {
-//        //lockFlag = true;
-//        if (chordHoldButton.getToggleState() == 0) {
-//            computeChords();
-//        }
-//        //lockFlag = false;
-//        //audioProcessor.setCurrentIRs();
-//        //updateDecayTimes();
-//    };
-    
-//    RootSelSlider.onDragEnd = [this]() {
-//
-//        if (chordHoldButton.getToggleState() == 1) {
-//            computeHeldChords();
-//        } else  if (chordHoldButton.getToggleState() == 0) {
-//            computeChords();
-//
-//        }
-        //audioProcessor.setCurrentIRs();
-        //updateDecayTimes();
-
-        //audioProcessor.setCurrentIRs();
-  //  };
-    
-    //addAndMakeVisible(irName);
-
     
     //pitch
     
@@ -119,39 +92,16 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     makeSlider(RootSelSlider, "");
     makeLabel(RootSelLabel, "Root", &RootSelSlider);
     RootSelAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "Root_Sel", RootSelSlider);
-
-    
     
     //lock button
     
     ChordHoldAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "Chord_Hold", chordHoldButton);
-
     
     chordHoldButton.setClickingTogglesState(true);
-
-    
 
     chordHoldButton.onClick  = [&]() {
         const auto buttonMessage = chordHoldButton.getToggleState() ? "Held" : "Hold";
         chordHoldButton.setButtonText(buttonMessage);
-        
-            auto currentPitch1 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_1");
-            int pitch1 = static_cast<int>(currentPitch1->load());
-            auto currentPitch2 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_2");
-            int pitch2 = static_cast<int>(currentPitch2->load());
-            auto currentPitch3 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_3");
-            int pitch3 = static_cast<int>(currentPitch3->load());
-            auto currentPitch4 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_4");
-            int pitch4 = static_cast<int>(currentPitch4->load());
-            auto currentPitch5 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_5");
-            int pitch5 = static_cast<int>(currentPitch5->load());
-        
-            HeldChordValues[0] = pitch1;
-            HeldChordValues[1] = pitch2;
-            HeldChordValues[2] = pitch3;
-            HeldChordValues[3] = pitch4;
-            HeldChordValues[4] = pitch5;
-
     };
                                                                                     
     addAndMakeVisible(chordHoldButton);
@@ -197,30 +147,6 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
         }
     };
     
-    //if (lockFlag == false) {
-//        PitchSel1Slider.onDragEnd = [this]() {
-//            audioProcessor.setCurrentIR(0);
-//            audioProcessor.updateDecayTime(0);
-//        };
-//        PitchSel2Slider.onDragEnd = [this]() {
-//            audioProcessor.setCurrentIR(1);
-//            audioProcessor.updateDecayTime(1);
-//        };
-//        PitchSel3Slider.onDragEnd = [this]() {
-//            audioProcessor.setCurrentIR(2);
-//            audioProcessor.updateDecayTime(2);
-//        };
-//        PitchSel4Slider.onDragEnd = [this]() {
-//            audioProcessor.setCurrentIR(3);
-//            audioProcessor.updateDecayTime(3);
-//        };
-//        PitchSel5Slider.onDragEnd = [this]() {
-//            audioProcessor.setCurrentIR(4);
-//            audioProcessor.updateDecayTime(4);
-//        };
-   // }
-    
-    //PitchSel5Slider.on
     
     addAndMakeVisible (IRSelect);
 
@@ -273,117 +199,17 @@ void PipeDreamAudioProcessorEditor::makeLabel(juce::Label &label,
 }
 
 
-//void PipeDreamAudioProcessorEditor::updateDecayTime(int voiceNumber) {
-//
-//    IDArray =   {"Pitch_Sel_1",
-//                "Pitch_Sel_2",
-//                "Pitch_Sel_3",
-//                "Pitch_Sel_4",
-//                "Pitch_Sel_5"
-//    };
-//    
-//    auto currentVoice = audioProcessor.apvts.getRawParameterValue(IDArray[voiceNumber]);
-//    int voice = static_cast<int>(currentVoice->load());
-//    
-//    audioProcessor.setDecay(voice + 12);
-//    audioProcessor.setCurrentIR(voiceNumber);
-//}
-
 
 
 PipeDreamAudioProcessorEditor::~PipeDreamAudioProcessorEditor()
 {
 }
 
-//void PipeDreamAudioProcessorEditor::computeChords() {
-//    //int currentChord = ChordSel->getCurrentChoiceName().getIntValue();
-//    auto ChordSel = audioProcessor.apvts.getRawParameterValue("Chord_Sel");
-//    int currentChord = static_cast<int>(ChordSel->load());
-//    
-//    auto offsetSel = audioProcessor.apvts.getRawParameterValue("Root_Sel");
-//    int offset = static_cast<int>(offsetSel->load());
-//    
-//    //set to current pitch firdt
-//    //1 change parameter 2, update current IR to match parameter, configure decay, re-write
-//    
-//    audioProcessor.apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_1")->convertTo0to1(chordArray[currentChord][0] + offset - 12));
-//    audioProcessor.apvts.getParameter("Pitch_Sel_1")->endChangeGesture(); //set pitch sel 1
-//    audioProcessor.setCurrentIR(0);
-//    audioProcessor.updateDecayTime(0);
-//
-//    audioProcessor.apvts.getParameter("Pitch_Sel_2")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_2")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_2")->convertTo0to1(chordArray[currentChord][1]+ offset - 12)) ;
-//    audioProcessor.apvts.getParameter("Pitch_Sel_2")->endChangeGesture();
-//    audioProcessor.setCurrentIR(1);
-//    audioProcessor.updateDecayTime(1);
-//    
-//    audioProcessor.apvts.getParameter("Pitch_Sel_3")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_3")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_3")->convertTo0to1(chordArray[currentChord][2]+ offset - 12)) ;
-//    audioProcessor.apvts.getParameter("Pitch_Sel_3")->endChangeGesture();
-//    audioProcessor.setCurrentIR(2);
-//    audioProcessor.updateDecayTime(2);
-//    
-//    audioProcessor.apvts.getParameter("Pitch_Sel_4")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_4")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_4")->convertTo0to1(chordArray[currentChord][3]+ offset - 12) );
-//    audioProcessor.apvts.getParameter("Pitch_Sel_4")->endChangeGesture();
-//    audioProcessor.setCurrentIR(3);
-//    audioProcessor.updateDecayTime(3);
-//    
-//    audioProcessor.apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_5")->convertTo0to1(chordArray[currentChord][4]+ offset - 12) );
-//    audioProcessor.apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
-//    audioProcessor.setCurrentIR(4);
-//    audioProcessor.updateDecayTime(4);
-//    
-//
-//}
-
-//void PipeDreamAudioProcessorEditor::computeHeldChords() {
-//    
-//    auto offsetSel = audioProcessor.apvts.getRawParameterValue("Root_Sel");
-//    int offset = static_cast<int>(offsetSel->load());
-//
-//    
-//    audioProcessor.apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_1")->convertTo0to1(HeldChordValues[0] + offset - 12));
-//    audioProcessor.apvts.getParameter("Pitch_Sel_1")->endChangeGesture();
-//    audioProcessor.setCurrentIR(0);
-//    audioProcessor.updateDecayTime(0);
-//
-//    audioProcessor.apvts.getParameter("Pitch_Sel_2")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_2")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_2")->convertTo0to1(HeldChordValues[1] + offset - 12)) ;
-//    audioProcessor.apvts.getParameter("Pitch_Sel_2")->endChangeGesture();
-//    audioProcessor.setCurrentIR(1);
-//    audioProcessor.updateDecayTime(1);
-//
-//    audioProcessor.apvts.getParameter("Pitch_Sel_3")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_3")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_3")->convertTo0to1(HeldChordValues[2] + offset - 12)) ;
-//    audioProcessor.apvts.getParameter("Pitch_Sel_3")->endChangeGesture();
-//    audioProcessor.setCurrentIR(2);
-//    audioProcessor.updateDecayTime(2);
-//
-//    audioProcessor.apvts.getParameter("Pitch_Sel_4")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_4")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_4")->convertTo0to1(HeldChordValues[3] + offset - 12) );
-//    audioProcessor.apvts.getParameter("Pitch_Sel_4")->endChangeGesture();
-//    audioProcessor.setCurrentIR(3);
-//    audioProcessor.updateDecayTime(3);
-//
-//    audioProcessor.apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
-//    audioProcessor.apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(audioProcessor.apvts.getParameter("Pitch_Sel_5")->convertTo0to1(HeldChordValues[4] + offset - 12));
-//    audioProcessor.apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
-//    audioProcessor.setCurrentIR(4);
-//    audioProcessor.updateDecayTime(4);
-//    
-//
-//}
-//==============================================================================
 void PipeDreamAudioProcessorEditor::paint (juce::Graphics& g)
 {
     auto sidePaddingWidth = 200;
     int spacerTop = 18;
     int linespacer = 30;
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     
     juce::Rectangle<int> rightPanelR = rightPanel.getBounds();
@@ -438,8 +264,6 @@ void PipeDreamAudioProcessorEditor::resized()
     int spacerTop = 18;
     int topBotPanelWidth = 40;
     int sidePaddingWidth = 150;
-
-    
    
 //    loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
 //    irName.setBounds(loadBtn.getX() + loadBtn.getWidth(), btnY, btnWidth * 2, btnHeight);
@@ -455,15 +279,12 @@ void PipeDreamAudioProcessorEditor::resized()
     
     //main labels
     
-    
 
     TitleLabel.setText ("Pipe Dream", juce::dontSendNotification);
     TitleLabel.setFont (juce::Font (32.0f, juce::Font::bold));
     TitleLabel.setJustificationType (juce::Justification::centred);
     addAndMakeVisible (TitleLabel);
     TitleLabel.setBounds(topPanel.getBounds());
-
-
 
     TubeLengthLabel.setText ("Tube Length", juce::dontSendNotification);
     TubeLengthLabel.setJustificationType (juce::Justification::centred);
@@ -602,25 +423,5 @@ void PipeDreamAudioProcessorEditor::resized()
 
     LeftRow2.performLayout(leftBoundsRow2);
     
-    
-//    
-//    //filter flexbox
-//    
-//    auto filterBounds = sidePanel.getBounds().removeFromBottom(sidePanel.getBounds().getHeight()/2).reduced(10);
-//    
-//    juce::FlexBox flexBoxFilter;
-//    flexBoxFilter.flexDirection = juce::FlexBox::Direction::row;
-//    flexBoxFilter.flexWrap = juce::FlexBox::Wrap::noWrap;
-//    
-//    flexBoxgain.items.add(spacer);
-//    flexBoxFilter.items.add(juce::FlexItem(LowPassSlider).withFlex(1.f));
-//    flexBoxgain.items.add(spacer);
-//    flexBoxFilter.items.add(juce::FlexItem(HighPassSlider).withFlex(1.f));
-//    flexBoxgain.items.add(spacer);
-//    flexBoxFilter.items.add(juce::FlexItem(DryWetSlider).withFlex(1.f));
-//    flexBoxgain.items.add(spacer);
-//
-//    flexBoxFilter.performLayout(filterBounds);
-//    
     
 }

@@ -39,24 +39,10 @@ private:
     
     juce::CustomStyle customStyle;
     
-//    int chordArray[9][5] = {
-//        {0, 0, 0, 0, 0}, // Mono
-//        {0, 0, 0, 7, 7}, // 5th
-//        {0, 0, 2, 2, 7}, // Sus2
-//        {0, 0, 3, 3, 7}, // Minor
-//        {0, 0, 4, 4, 7}, // Major
-//        {0, 0, 5, 5, 7}, // sus4
-//        {0, 4, 4, 7, 11}, // Maj7
-//        {0, 3, 3, 7, 11}, // min7
-//        {0, 0, 7, 9, 9} // 7sus
-//    };
     
-    std::array<int, 5> HeldChordValues;
-    //std::array<int, 5> currentChordValues;
-    
-    //std::Atomic lockValue = 4;
-    
-    bool lockFlag = false;
+//    std::array<int, 5> HeldChordValues;
+//
+//    bool lockFlag = false;
     
     PipeDreamAudioProcessor& audioProcessor;
     juce::ValueTree& variableTree;

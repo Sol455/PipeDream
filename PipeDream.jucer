@@ -22,6 +22,7 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="nd57s9" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <FILE id="qnxCTH" name="PVC_A2.wav" compile="0" resource="1" file="/Library/Application Support/PipeDream/IRs/PVC_A2.wav"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>
