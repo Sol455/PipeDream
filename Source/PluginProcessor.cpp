@@ -287,7 +287,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 
 void PipeDreamAudioProcessor::parameterChanged(const juce::String &parameterID, float newValue)
 {
-    std::cout << "\nARAMY\n\n";
     
 }
 
@@ -465,7 +464,7 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferBankID) {
         for (int i = 0; i < 37; i++) {
             normaliseAndTrim(bufferBankID, i);
         }
-        std::cout << "\n\nDONE!!\n\n";
+        //std::cout << "\n\nDONE!!\n\n";
         delete reader;
         
         setCurrentIRs();
@@ -484,48 +483,48 @@ void PipeDreamAudioProcessor::readIRFromBinary(int IRNum, int bufferBankID) {
         }
         
         //trim buffer below 1sec
-        repitchBuffer(reader, 0, -12, bufferBankID);
-        repitchBuffer(reader, 1, -11, bufferBankID);
-        repitchBuffer(reader, 2, -10, bufferBankID);
-        repitchBuffer(reader, 3, -9, bufferBankID);
-        repitchBuffer(reader, 4, -8, bufferBankID);
-        repitchBuffer(reader, 5, -7, bufferBankID);
-        repitchBuffer(reader, 6, -6, bufferBankID);
-        repitchBuffer(reader, 7, -5, bufferBankID);
-        repitchBuffer(reader, 8, -4, bufferBankID);
-        repitchBuffer(reader, 9, -3, bufferBankID);
-        repitchBuffer(reader, 10, -2, bufferBankID);
-        repitchBuffer(reader, 11, -1, bufferBankID);
-        repitchBuffer(reader, 12, 0, bufferBankID);
-        repitchBuffer(reader, 13, 1, bufferBankID);
-        repitchBuffer(reader, 14, 2, bufferBankID);
-        repitchBuffer(reader, 15, 3, bufferBankID);
-        repitchBuffer(reader, 16, 4, bufferBankID);
-        repitchBuffer(reader, 17, 5, bufferBankID);
-        repitchBuffer(reader, 18, 6, bufferBankID);
-        repitchBuffer(reader, 19, 7, bufferBankID);
-        repitchBuffer(reader, 20, 8, bufferBankID);
-        repitchBuffer(reader, 21, 9, bufferBankID);
-        repitchBuffer(reader, 22, 10, bufferBankID);
-        repitchBuffer(reader, 23, 11, bufferBankID);
-        repitchBuffer(reader, 24, 12, bufferBankID);
-        repitchBuffer(reader, 25, 13, bufferBankID);
-        repitchBuffer(reader, 26, 14, bufferBankID);
-        repitchBuffer(reader, 27, 15, bufferBankID);
-        repitchBuffer(reader, 28, 16, bufferBankID);
-        repitchBuffer(reader, 29, 17, bufferBankID);
-        repitchBuffer(reader, 30, 18, bufferBankID);
-        repitchBuffer(reader, 31, 19, bufferBankID);
-        repitchBuffer(reader, 32, 20, bufferBankID);
-        repitchBuffer(reader, 33, 21, bufferBankID);
-        repitchBuffer(reader, 34, 22, bufferBankID);
-        repitchBuffer(reader, 35, 23, bufferBankID);
-        repitchBuffer(reader, 36, 24, bufferBankID);
+        repitchBuffer(reader, 0, -9, bufferBankID);
+        repitchBuffer(reader, 1, -8, bufferBankID);
+        repitchBuffer(reader, 2, -7, bufferBankID);
+        repitchBuffer(reader, 3, -6, bufferBankID);
+        repitchBuffer(reader, 4, -5, bufferBankID);
+        repitchBuffer(reader, 5, -4, bufferBankID);
+        repitchBuffer(reader, 6, -3, bufferBankID);
+        repitchBuffer(reader, 7, -2, bufferBankID);
+        repitchBuffer(reader, 8, -1, bufferBankID);
+        repitchBuffer(reader, 9, 0, bufferBankID);
+        repitchBuffer(reader, 10, 1, bufferBankID);
+        repitchBuffer(reader, 11, 2, bufferBankID);
+        repitchBuffer(reader, 12, 3, bufferBankID);
+        repitchBuffer(reader, 13, 4, bufferBankID);
+        repitchBuffer(reader, 14, 5, bufferBankID);
+        repitchBuffer(reader, 15, 6, bufferBankID);
+        repitchBuffer(reader, 16, 7, bufferBankID);
+        repitchBuffer(reader, 17, 8, bufferBankID);
+        repitchBuffer(reader, 18, 9, bufferBankID);
+        repitchBuffer(reader, 19, 10, bufferBankID);
+        repitchBuffer(reader, 20, 11, bufferBankID);
+        repitchBuffer(reader, 21, 12, bufferBankID);
+        repitchBuffer(reader, 22, 13, bufferBankID);
+        repitchBuffer(reader, 23, 14, bufferBankID);
+        repitchBuffer(reader, 24, 15, bufferBankID);
+        repitchBuffer(reader, 25, 16, bufferBankID);
+        repitchBuffer(reader, 26, 17, bufferBankID);
+        repitchBuffer(reader, 27, 18, bufferBankID);
+        repitchBuffer(reader, 28, 19, bufferBankID);
+        repitchBuffer(reader, 29, 20, bufferBankID);
+        repitchBuffer(reader, 30, 21, bufferBankID);
+        repitchBuffer(reader, 31, 22, bufferBankID);
+        repitchBuffer(reader, 32, 23, bufferBankID);
+        repitchBuffer(reader, 33, 24, bufferBankID);
+        repitchBuffer(reader, 34, 25, bufferBankID);
+        repitchBuffer(reader, 35, 26, bufferBankID);
+        repitchBuffer(reader, 36, 27, bufferBankID);
         
         for (int i = 0; i < 37; i++) {
             normaliseAndTrim(bufferBankID, i);
         }
-        std::cout << "\n\nDONE!!\n\n";
+        //std::cout << "\n\nDONE!!\n\n";
          delete reader;
         setCurrentIRs();
 }
@@ -554,7 +553,7 @@ void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int
     
     juce::LagrangeInterpolator interpolator;
                 int iResult = 0;
-                std::cout << reader->numChannels;
+                //std::cout << reader->numChannels;
                 for (int i = 0; i < reader->numChannels; i++) {
                     iResult = interpolator.process(ratio,
                         temp.getReadPointer(i),
@@ -591,7 +590,7 @@ void PipeDreamAudioProcessor::normaliseAndTrim(int bufferBankID, int bufferNum) 
     //normalize
     float MaxMagnitude = BufferStoreArray[bufferBankID].BufBankReadP(bufferNum).getMagnitude(0, BufferStoreArray[bufferBankID].getSamples(bufferNum));
     BufferStoreArray[bufferBankID].BufBankReadP(bufferNum).applyGain(1.0f / (MaxMagnitude + 0.01));
-    std::cout << "\nBufStore BUFFER MAG:"<< MaxMagnitude;
+    //std::cout << "\nBufStore BUFFER MAG:"<< MaxMagnitude;
     
     //copy to refernce buffers
     auto currentBuffer = BufferStoreArray[bufferBankID].BufBankReadP(bufferNum);
@@ -599,7 +598,7 @@ void PipeDreamAudioProcessor::normaliseAndTrim(int bufferBankID, int bufferNum) 
     referenceBufferStoreArray[bufferBankID].makecopy(bufferNum, currentBuffer);
     
     float MaxMagnitudeRef = referenceBufferStoreArray[bufferBankID].BufBankReadP(bufferNum).getMagnitude(0, referenceBufferStoreArray[bufferBankID].getSamples(bufferNum));
-    std::cout << "\RefBuffer BUFFER MAG:"<< MaxMagnitudeRef;
+    //std::cout << "\RefBuffer BUFFER MAG:"<< MaxMagnitudeRef;
 }
 
 void PipeDreamAudioProcessor::loadUserIR() {
