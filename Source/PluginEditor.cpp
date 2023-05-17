@@ -146,11 +146,11 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
             auto currentPitch5 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_5");
             int pitch5 = static_cast<int>(currentPitch5->load());
         
-//            HeldChordValues[0] = pitch1;
-//            HeldChordValues[1] = pitch2;
-//            HeldChordValues[2] = pitch3;
-//            HeldChordValues[3] = pitch4;
-//            HeldChordValues[4] = pitch5;
+            audioProcessor.HeldChordValues[0] = pitch1;
+            audioProcessor.HeldChordValues[1] = pitch2;
+            audioProcessor.HeldChordValues[2] = pitch3;
+            audioProcessor.HeldChordValues[3] = pitch4;
+            audioProcessor.HeldChordValues[4] = pitch5;
 
     };
                                                                                     

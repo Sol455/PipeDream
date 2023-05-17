@@ -121,13 +121,29 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     chordSelPA.onParameterChanged = [&] {
         //startTimer(20);
         chordSelPA.startTimer(20);
-        chordSelPA.onTimerCallback = [&] {computeChords();};
+        chordSelPA.onTimerCallback = [&] {
+            if(ChordHold->get()) {
+                computeHeldChords();
+                std::cout << "held chords";
+            } else {
+                std::cout << "regular chords";
+                computeChords();
+            }
+        };
     };
 
     RootSelPA.attachToParameter(apvts.getParameter("Root_Sel"));
     RootSelPA.onParameterChanged = [&] {
         RootSelPA.startTimer(20);
-        RootSelPA.onTimerCallback = [&] {computeChords();};
+        RootSelPA.onTimerCallback = [&] {
+            if(ChordHold->get()) {
+                std::cout << "held chords";
+                computeHeldChords();
+            } else {
+                computeChords();
+                std::cout << "regular chords";
+            }
+        };
         //startTimer(20);
     };
 

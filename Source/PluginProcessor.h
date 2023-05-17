@@ -129,6 +129,8 @@ public:
     juce::dsp::DryWetMixer<float> dry_wet_mixer;
     
     juce::Value UserIRFilePath = apvts.state.getPropertyAsValue("UserIRFilePath", nullptr, true);
+    
+    std::array<int, 5> HeldChordValues;
 
 
 
@@ -205,8 +207,6 @@ private:
         {0, 3, 3, 7, 11}, // min7
         {0, 0, 7, 9, 9} // 7sus
     };
-    
-    std::array<int, 5> HeldChordValues;
     
     
     void parameterChanged (const juce::String& arameterID, float newValue) override;
