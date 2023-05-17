@@ -5,6 +5,8 @@
               companyWebsite="www.solharter.com" cppLanguageStandard="17" pluginFormats="buildVST3">
   <MAINGROUP id="DJ8px5" name="PipeDream">
     <GROUP id="{DA2250E7-A89F-7E78-0C56-356084F7AAB0}" name="Source">
+      <FILE id="ei9RLA" name="ParamAttachHelper.h" compile="0" resource="0"
+            file="Source/ParamAttachHelper.h"/>
       <FILE id="ak5zpk" name="LooknFeel.h" compile="0" resource="0" file="Source/LooknFeel.h"/>
       <FILE id="riZWrd" name="LooknFeel.cpp" compile="1" resource="0" file="Source/LooknFeel.cpp"/>
       <FILE id="zR6mC9" name="ParallelProcessors.h" compile="0" resource="0"
