@@ -119,7 +119,6 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
 
     chordSelPA.attachToParameter(apvts.getParameter("Chord_Sel"));
     chordSelPA.onParameterChanged = [&] {
-        //startTimer(20);
         chordSelPA.startTimer(20);
         chordSelPA.onTimerCallback = [&] {
             if(ChordHold->get()) {
@@ -144,7 +143,15 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
                 std::cout << "regular chords";
             }
         };
-        //startTimer(20);
+    };
+    
+    ChordHoldPA.attachToParameter(apvts.getParameter("Chord_Hold"));
+    ChordHoldPA.onParameterChanged = [&] {
+        HeldChordValues[0] = pitchsel1->get();
+        HeldChordValues[1] = pitchsel2->get();
+        HeldChordValues[2] = pitchsel3->get();
+        HeldChordValues[3] = pitchsel4->get();
+        HeldChordValues[4] = pitchsel5->get();
     };
 
 }
@@ -380,7 +387,7 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     soundtouch.setChannels(1);
     
     dry_wet_mixer.prepare(spec);
-    readIRFromFile(2, 0);
+    readIRFromBinary(4, 0);
     ParallelConvs.prepare(spec);
     
     for(auto& buffer: audioSplitBuffers)
@@ -413,10 +420,10 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     
 void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferBankID) {
     
-    if (IRNum != 4) {
-        currentIR = FilePath + IRNames[IRNum];
-    } else {
+    if (IRNum == 4) {
         currentIR = UserIRFilePath.getValue().toString();
+    } else {
+        return;
     }
     
     if(currentIR.existsAsFile())
@@ -470,25 +477,75 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferBankID) {
         repitchBuffer(reader, 35, 23, bufferBankID);
         repitchBuffer(reader, 36, 24, bufferBankID);
         
-//        for (int i = 0; i < 12; i ++) {
-//            repitchBuffer(reader, i, (-12 + i));
-//       }
-//
-//        for (int i = 12; i <= 24; i++) {
-//            repitchBuffer(reader, i, (i - 12));
-//       }
+        for (int i = 0; i < 37; i++) {
+            normaliseAndTrim(bufferBankID, i);
+        }
+        std::cout << "\n\nDONE!!\n\n";
+        delete reader;
         
-//            repitchBuffer(reader, 4, 100000, -2);
-//            repitchBuffer(reader, 5, 200000, 3);
-        
+        setCurrentIRs();
+    }
+}
+
+
+void PipeDreamAudioProcessor::readIRFromBinary(int IRNum, int bufferBankID) {
+        juce::MemoryInputStream* inputStream = new juce::MemoryInputStream(BinaryData::PVC_A2_wav, BinaryData::PVC_A2_wavSize, false);
+        juce::WavAudioFormat format;
+        juce::AudioFormatReader *reader = format.createReaderFor(inputStream, true);
+
+        if (reader == nullptr)
+        {
+            jassertfalse;
+            return;
+        }
+
+        //trim buffer below 1sec
+        repitchBuffer(reader, 0, -12, bufferBankID);
+        repitchBuffer(reader, 1, -11, bufferBankID);
+        repitchBuffer(reader, 2, -10, bufferBankID);
+        repitchBuffer(reader, 3, -9, bufferBankID);
+        repitchBuffer(reader, 4, -8, bufferBankID);
+        repitchBuffer(reader, 5, -7, bufferBankID);
+        repitchBuffer(reader, 6, -6, bufferBankID);
+        repitchBuffer(reader, 7, -5, bufferBankID);
+        repitchBuffer(reader, 8, -4, bufferBankID);
+        repitchBuffer(reader, 9, -3, bufferBankID);
+        repitchBuffer(reader, 10, -2, bufferBankID);
+        repitchBuffer(reader, 11, -1, bufferBankID);
+        repitchBuffer(reader, 12, 0, bufferBankID);
+        repitchBuffer(reader, 13, 1, bufferBankID);
+        repitchBuffer(reader, 14, 2, bufferBankID);
+        repitchBuffer(reader, 15, 3, bufferBankID);
+        repitchBuffer(reader, 16, 4, bufferBankID);
+        repitchBuffer(reader, 17, 5, bufferBankID);
+        repitchBuffer(reader, 18, 6, bufferBankID);
+        repitchBuffer(reader, 19, 7, bufferBankID);
+        repitchBuffer(reader, 20, 8, bufferBankID);
+        repitchBuffer(reader, 21, 9, bufferBankID);
+        repitchBuffer(reader, 22, 10, bufferBankID);
+        repitchBuffer(reader, 23, 11, bufferBankID);
+        repitchBuffer(reader, 24, 12, bufferBankID);
+        repitchBuffer(reader, 25, 13, bufferBankID);
+        repitchBuffer(reader, 26, 14, bufferBankID);
+        repitchBuffer(reader, 27, 15, bufferBankID);
+        repitchBuffer(reader, 28, 16, bufferBankID);
+        repitchBuffer(reader, 29, 17, bufferBankID);
+        repitchBuffer(reader, 30, 18, bufferBankID);
+        repitchBuffer(reader, 31, 19, bufferBankID);
+        repitchBuffer(reader, 32, 20, bufferBankID);
+        repitchBuffer(reader, 33, 21, bufferBankID);
+        repitchBuffer(reader, 34, 22, bufferBankID);
+        repitchBuffer(reader, 35, 23, bufferBankID);
+        repitchBuffer(reader, 36, 24, bufferBankID);
+
         for (int i = 0; i < 37; i++) {
             normaliseAndTrim(bufferBankID, i);
         }
         std::cout << "\n\nDONE!!\n\n";
          delete reader;
-        
+
         setCurrentIRs();
-    }
+
 }
 
 void PipeDreamAudioProcessor::repitchBuffer(juce::AudioFormatReader *reader, int bufferNum, int semitoneIn, int bufferBankID) {
@@ -928,8 +985,8 @@ void PipeDreamAudioProcessor::setStateInformation (const void* data, int sizeInB
 
         if (tree.isValid()) {
             apvts.replaceState(tree);
-            UserIRFilePath.referTo(apvts.state.getPropertyAsValue("IR_select", nullptr, true));
-            loadUserIR();
+            //UserIRFilePath.referTo(apvts.state.getPropertyAsValue("IR_select", nullptr, true));
+            //loadUserIR();
         }
     
 }

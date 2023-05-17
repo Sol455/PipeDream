@@ -75,6 +75,7 @@ public:
     void computeChords();
     void loadUserIR();
     void computeHeldChords();
+    void readIRFromBinary(int IRNum, int bufferBankID);
     //void timerCallback() override;
 
     
@@ -195,6 +196,7 @@ private:
 
     foleys::ParameterAttachment<int> chordSelPA;
     foleys::ParameterAttachment<int> RootSelPA;
+    foleys::ParameterAttachment<bool> ChordHoldPA;
     
     int chordArray[9][5] = {
         {0, 0, 0, 0, 0}, // Mono

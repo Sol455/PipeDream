@@ -134,23 +134,7 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     chordHoldButton.onClick  = [&]() {
         const auto buttonMessage = chordHoldButton.getToggleState() ? "Held" : "Hold";
         chordHoldButton.setButtonText(buttonMessage);
-        
-            auto currentPitch1 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_1");
-            int pitch1 = static_cast<int>(currentPitch1->load());
-            auto currentPitch2 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_2");
-            int pitch2 = static_cast<int>(currentPitch2->load());
-            auto currentPitch3 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_3");
-            int pitch3 = static_cast<int>(currentPitch3->load());
-            auto currentPitch4 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_4");
-            int pitch4 = static_cast<int>(currentPitch4->load());
-            auto currentPitch5 = audioProcessor.apvts.getRawParameterValue("Pitch_Sel_5");
-            int pitch5 = static_cast<int>(currentPitch5->load());
-        
-            audioProcessor.HeldChordValues[0] = pitch1;
-            audioProcessor.HeldChordValues[1] = pitch2;
-            audioProcessor.HeldChordValues[2] = pitch3;
-            audioProcessor.HeldChordValues[3] = pitch4;
-            audioProcessor.HeldChordValues[4] = pitch5;
+
 
     };
                                                                                     
