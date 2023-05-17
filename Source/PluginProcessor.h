@@ -92,17 +92,6 @@ public:
     
     juce::AudioSampleBuffer fileBuffer;
     
-    
-    static juce::String getPathtoIRFolder()
-    {
-        if((juce::SystemStats::getOperatingSystemType() & juce::SystemStats::MacOSX) != 0)
-        {
-            return juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonApplicationDataDirectory).getFullPathName() + "/Application Support/PipeDream/IRs/";
-        }
-        return "";
-    }
-    
-    juce::String FilePath = getPathtoIRFolder();
 
     //BufferStore bufferStore
     
@@ -110,7 +99,7 @@ public:
     std::array<BufferStore, 4> referenceBufferStoreArray;
     //BufferStore referenceBuffers;
     
-    juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
+    //juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
     
     //split buffers (prep for filtering)
     std::array<juce::AudioBuffer<float>, 5> audioSplitBuffers;

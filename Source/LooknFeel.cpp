@@ -13,25 +13,13 @@
 namespace juce {
 
 CustomStyle::CustomStyle() {
-//  setDefaultSansSerifTypeface(juce::Typeface::createSystemTypefaceFor(
-//      BinaryData::SpartanMedium_ttf, BinaryData::SpartanMedium_ttfSize));
-
-//  auto backgroundColour = Colour::fromRGB(252, 248, 237);
-//  auto normalTextColour = Colour::fromRGB(111, 76, 91);
-//  auto lightTextColour = Colour::fromRGB(158, 119, 119);
-//  auto buttonColour = Colour::fromRGB(158, 119, 119);
-//
-//  auto sliderFillColour = Colour::fromRGB(158, 119, 119);
-//  auto sliderOutlineColour = Colour::fromRGB(222, 186, 157);
+    auto backgroundColour = Colour::fromString("0xffDAF0EE");
+    auto normalTextColour = Colour::fromString("0xff3B413C");
+    auto lightTextColour = Colour::fromString("0xff3B413C");
     
-    
-    auto backgroundColour = Colour::fromRGB(255, 247, 230);
-    auto normalTextColour = Colour::fromRGB(111, 76, 91);
-    auto lightTextColour = Colour::fromRGB(153, 102, 0);
-    auto buttonColour = Colour::fromRGB(153, 102, 0);
-
-    auto sliderFillColour = Colour::fromRGB(153, 102, 0);
-    auto sliderOutlineColour = Colour::fromRGB(255, 187, 51);
+    auto buttonColour = Colour::fromString("0xff70C2A8");
+    auto sliderFillColour = Colour::fromString("0xff3B413C");
+    auto sliderOutlineColour = Colour::fromString("0xff70C2A8");
 
   setColour(ColourScheme::widgetBackground, normalTextColour);
   setColour(ColourScheme::windowBackground, backgroundColour);
