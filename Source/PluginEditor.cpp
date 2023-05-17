@@ -24,23 +24,23 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     DBG("variable tree in editor = " << static_cast<int>(variableTree.isValid()));
     LoadButton.onClick = [this]()
     {
-        fileChooser = std::make_unique<juce::FileChooser>("Choose File",
-                                                          audioProcessor.root,
-                                                          "*");
-        const auto fileChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::canSelectDirectories;
-        
-        fileChooser->launchAsync(fileChooserFlags, [this](const juce::FileChooser& chooser)
-        {
-            juce::File result (chooser.getResult());
-            
-            if (result.getFileExtension() == ".wav" | result.getFileExtension() == ".mp3")
-            {
-                audioProcessor.savedFile = result;
-                audioProcessor.UserIRFilePath.setValue(audioProcessor.savedFile.getFullPathName());
-                audioProcessor.loadUserIR();
-                
-            }
-        });
+//        fileChooser = std::make_unique<juce::FileChooser>("Choose File",
+//                                                          audioProcessor.root,
+//                                                          "*");
+//        const auto fileChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::canSelectDirectories;
+//
+//        fileChooser->launchAsync(fileChooserFlags, [this](const juce::FileChooser& chooser)
+//        {
+//            juce::File result (chooser.getResult());
+//
+//            if (result.getFileExtension() == ".wav" | result.getFileExtension() == ".mp3")
+//            {
+//                audioProcessor.savedFile = result;
+//                audioProcessor.UserIRFilePath.setValue(audioProcessor.savedFile.getFullPathName());
+//                audioProcessor.loadUserIR();
+//
+//            }
+//        });
     };
     
     

@@ -137,6 +137,15 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
 
 PipeDreamAudioProcessor::~PipeDreamAudioProcessor()
 {
+//    pitchSel1PA.detachFromParameter();
+//    pitchSel2PA.detachFromParameter();
+//    pitchSel3PA.detachFromParameter();
+//    pitchSel4PA.detachFromParameter();
+//    pitchSel5PA.detachFromParameter();
+//    chordSelPA.detachFromParameter();
+//    RootSelPA.detachFromParameter();
+//    ChordHoldPA.detachFromParameter();
+    
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout
@@ -464,7 +473,6 @@ void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferBankID) {
         for (int i = 0; i < 37; i++) {
             normaliseAndTrim(bufferBankID, i);
         }
-        //std::cout << "\n\nDONE!!\n\n";
         delete reader;
         
         setCurrentIRs();
@@ -525,7 +533,7 @@ void PipeDreamAudioProcessor::readIRFromBinary(int IRNum, int bufferBankID) {
             normaliseAndTrim(bufferBankID, i);
         }
         //std::cout << "\n\nDONE!!\n\n";
-         delete reader;
+        delete reader;
         setCurrentIRs();
 }
 
@@ -790,23 +798,28 @@ void PipeDreamAudioProcessor::computeChords() {
     
     apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_1")->convertTo0to1(chordArray[currentChord][0] + offset - 12));
-    apvts.getParameter("Pitch_Sel_1")->endChangeGesture(); 
+    apvts.getParameter("Pitch_Sel_1")->endChangeGesture();
+    updateDecayTime(0);
 
     apvts.getParameter("Pitch_Sel_2")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_2")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_2")->convertTo0to1(chordArray[currentChord][1]+ offset - 12)) ;
     apvts.getParameter("Pitch_Sel_2")->endChangeGesture();
+    updateDecayTime(1);
 
     apvts.getParameter("Pitch_Sel_3")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_3")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_3")->convertTo0to1(chordArray[currentChord][2]+ offset - 12)) ;
     apvts.getParameter("Pitch_Sel_3")->endChangeGesture();
+    updateDecayTime(2);
 
     apvts.getParameter("Pitch_Sel_4")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_4")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_4")->convertTo0to1(chordArray[currentChord][3]+ offset - 12) );
     apvts.getParameter("Pitch_Sel_4")->endChangeGesture();
+    updateDecayTime(3);
 
     apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_5")->convertTo0to1(chordArray[currentChord][4]+ offset - 12) );
     apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
+    updateDecayTime(4);
 
 }
 
@@ -819,27 +832,31 @@ void PipeDreamAudioProcessor::computeHeldChords() {
     apvts.getParameter("Pitch_Sel_1")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_1")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_1")->convertTo0to1(HeldChordValues[0] + offset - 12));
     apvts.getParameter("Pitch_Sel_1")->endChangeGesture();
+    updateDecayTime(0);
 
     apvts.getParameter("Pitch_Sel_2")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_2")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_2")->convertTo0to1(HeldChordValues[1] + offset - 12)) ;
     apvts.getParameter("Pitch_Sel_2")->endChangeGesture();
+    updateDecayTime(1);
 
 
     apvts.getParameter("Pitch_Sel_3")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_3")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_3")->convertTo0to1(HeldChordValues[2] + offset - 12)) ;
     apvts.getParameter("Pitch_Sel_3")->endChangeGesture();
+    updateDecayTime(2);
 
 
     apvts.getParameter("Pitch_Sel_4")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_4")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_4")->convertTo0to1(HeldChordValues[3] + offset - 12));
     apvts.getParameter("Pitch_Sel_4")->endChangeGesture();
+    updateDecayTime(3);
 
 
     apvts.getParameter("Pitch_Sel_5")->beginChangeGesture();
     apvts.getParameter("Pitch_Sel_5")->setValueNotifyingHost(apvts.getParameter("Pitch_Sel_5")->convertTo0to1(HeldChordValues[4] + offset - 12));
     apvts.getParameter("Pitch_Sel_5")->endChangeGesture();
+    updateDecayTime(4);
 
-    
 
 }
 
@@ -934,19 +951,19 @@ void PipeDreamAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 
 void PipeDreamAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-//    auto tree = juce::ValueTree::readFromData(data, size_t(sizeInBytes));
-//    variableTree = tree.getChildWithName("variables");
-//
-//    if (tree.isValid())
-//    {
-//        apvts.state = tree;
-//
-//        savedFile = variableTree.getProperty("file1");
-//        //root = variableTree.getProperty("root");
-//
-//        //irLoader.loadImpulseResponse(savedFile, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0);
-//
-//    }
+                //    auto tree = juce::ValueTree::readFromData(data, size_t(sizeInBytes));
+                //    variableTree = tree.getChildWithName("variables");
+                //
+                //    if (tree.isValid())
+                //    {
+                //        apvts.state = tree;
+                //
+                //        savedFile = variableTree.getProperty("file1");
+                //        //root = variableTree.getProperty("root");
+                //
+                //        //irLoader.loadImpulseResponse(savedFile, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0);
+                //
+                //    }
     
     auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
 

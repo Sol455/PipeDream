@@ -15,7 +15,7 @@ namespace juce {
 CustomStyle::CustomStyle() {
 
     
-        auto backgroundColour = Colour::fromString("0xffE2F3F1");
+        auto backgroundColour = Colour::fromString("0xffDAF0EE");
         auto normalTextColour = Colour::fromString("0xff3B413C");
         auto lightTextColour = Colour::fromString("0xff3B413C");
         auto buttonColour = Colour::fromString("0xff70C2A8");

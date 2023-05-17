@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="Ka37Me" name="PipeDream" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Sol"
-              companyWebsite="www.solharter.com" cppLanguageStandard="17" pluginFormats="buildVST3">
+              companyWebsite="www.solharter.com" cppLanguageStandard="17" pluginFormats="buildAU,buildAUv3,buildVST3">
   <MAINGROUP id="DJ8px5" name="PipeDream">
     <GROUP id="{DA2250E7-A89F-7E78-0C56-356084F7AAB0}" name="Source">
       <FILE id="B9FoMW" name="ParamAttachHelper.h" compile="0" resource="0"
