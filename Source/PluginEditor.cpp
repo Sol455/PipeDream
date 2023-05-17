@@ -95,16 +95,16 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     
     //lock button
     
-    ChordHoldAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "Chord_Hold", chordHoldButton);
-    
-    chordHoldButton.setClickingTogglesState(true);
-
-    chordHoldButton.onClick  = [&]() {
-        const auto buttonMessage = chordHoldButton.getToggleState() ? "Held" : "Hold";
-        chordHoldButton.setButtonText(buttonMessage);
-    };
-                                                                                    
-    addAndMakeVisible(chordHoldButton);
+//    ChordHoldAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "Chord_Hold", chordHoldButton);
+//
+//    chordHoldButton.setClickingTogglesState(true);
+//
+//    chordHoldButton.onClick  = [&]() {
+//        const auto buttonMessage = chordHoldButton.getToggleState() ? "Held" : "Hold";
+//        chordHoldButton.setButtonText(buttonMessage);
+//    };
+//
+//    addAndMakeVisible(chordHoldButton);
     addAndMakeVisible(LoadButton);
     //add menu item
     
@@ -148,19 +148,18 @@ PipeDreamAudioProcessorEditor::PipeDreamAudioProcessorEditor (PipeDreamAudioProc
     };
     
     
-    addAndMakeVisible (IRSelect);
-
-    //IRsel
-    IRSelect.addItem ("PVC",  1);
-    IRSelect.addItem ("Glass",   2);
-    IRSelect.addItem ("Metal", 3);
-    IRSelect.addItem ("User", 4);
-    
-    IRSelectAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "IR_select", IRSelect);
-
-     
-    IRSelect.onChange = [this] { IRChanged(); };
-    //IRSelect.setSelectedId (1);
+//    addAndMakeVisible (IRSelect);
+//
+//    //IRsel
+//    IRSelect.addItem ("PVC",  1);
+//    IRSelect.addItem ("Glass",   2);
+//    IRSelect.addItem ("Metal", 3);
+//    IRSelect.addItem ("User", 4);
+//
+//    IRSelectAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "IR_select", IRSelect);
+//
+//
+//    IRSelect.onChange = [this] { IRChanged(); };
     
     
     setSize (750, 320);
@@ -352,9 +351,9 @@ void PipeDreamAudioProcessorEditor::resized()
     
     auto buttonBounds = bottomPanel.getBounds();//.removeFromRight(sidePaddingWidth * 3);
     
-    chordHoldButton.setBounds(buttonBounds.removeFromRight(buttonBounds.getWidth()/3).reduced(2));
+    //chordHoldButton.setBounds(buttonBounds.removeFromRight(buttonBounds.getWidth()/3).reduced(2));
     LoadButton.setBounds(buttonBounds.removeFromRight(buttonBounds.getWidth()/2).reduced(2));
-    IRSelect.setBounds(buttonBounds.reduced(2));
+    //IRSelect.setBounds(buttonBounds.reduced(2));
    
     
     //Right panel

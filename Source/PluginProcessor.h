@@ -91,6 +91,20 @@ public:
     
     juce::AudioSampleBuffer fileBuffer;
     
+    static juce::String getPathtoIRFolder()
+       {
+           if((juce::SystemStats::getOperatingSystemType() & juce::SystemStats::MacOSX) != 0)
+           {
+               return juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonApplicationDataDirectory).getFullPathName() + "/Application Support/PipeDream/IRs/";
+           }
+           return "";
+       }
+    
+    juce::String IRNames[3]= {"DRAIN.wav", "GUITAR.wav", "PVC_A2.wav"};
+       
+       juce::String FilePath = getPathtoIRFolder();
+
+    
     std::array<BufferStore, 4> BufferStoreArray;
     std::array<BufferStore, 4> referenceBufferStoreArray;
 
@@ -133,13 +147,13 @@ private:
     
     juce::AudioParameterChoice* ChordSel {nullptr};
     juce::AudioParameterChoice* rootSel {nullptr};
-    juce::AudioParameterBool* ChordHold {nullptr};
+    //juce::AudioParameterBool* ChordHold {nullptr};
     
     juce::AudioParameterFloat* DryWet {nullptr};
     juce::AudioParameterFloat* DecayTime {nullptr};
     juce::AudioParameterFloat* LowPassCutOff {nullptr};
     juce::AudioParameterFloat* HighPassCutOff {nullptr};
-    juce::AudioParameterChoice* IRSelect {nullptr};
+    //juce::AudioParameterChoice* IRSelect {nullptr};
     
     juce::AudioParameterFloat* GainInM {nullptr};
     juce::AudioParameterFloat* GainOutM {nullptr};
@@ -156,14 +170,14 @@ private:
     std::array<juce::AudioBuffer<float>, 5> bufferCache;
     
     //Parameter listeners & helpers
-    foleys::ParameterAttachment<int> pitchSel1PA;
-    foleys::ParameterAttachment<int> pitchSel2PA;
-    foleys::ParameterAttachment<int> pitchSel3PA;
-    foleys::ParameterAttachment<int> pitchSel4PA;
-    foleys::ParameterAttachment<int> pitchSel5PA;
-    foleys::ParameterAttachment<int> chordSelPA;
-    foleys::ParameterAttachment<int> RootSelPA;
-    foleys::ParameterAttachment<bool> ChordHoldPA;
+//    foleys::ParameterAttachment<int> pitchSel1PA;
+//    foleys::ParameterAttachment<int> pitchSel2PA;
+//    foleys::ParameterAttachment<int> pitchSel3PA;
+//    foleys::ParameterAttachment<int> pitchSel4PA;
+//    foleys::ParameterAttachment<int> pitchSel5PA;
+//    foleys::ParameterAttachment<int> chordSelPA;
+//    foleys::ParameterAttachment<int> RootSelPA;
+//    foleys::ParameterAttachment<bool> ChordHoldPA;
     
     int chordArray[9][5] = {
         {0, 0, 0, 0, 0}, // Mono

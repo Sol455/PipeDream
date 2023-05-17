@@ -77,61 +77,61 @@ PipeDreamAudioProcessor::PipeDreamAudioProcessor()
     
     choiceHelper(ChordSel, Names::Chord_Sel);
     choiceHelper(rootSel, Names::Root_Sel);
-    choiceHelper(IRSelect, Names::IR_select);
+    //choiceHelper(IRSelect, Names::IR_select);
     
-    boolHelper(ChordHold, Names::Chord_Hold);
+    //boolHelper(ChordHold, Names::Chord_Hold);
     
     UserIRFilePath = apvts.state.getPropertyAsValue("UserIRFilePath", nullptr, true);
     
     //parameter attachments
-    pitchSel1PA.attachToParameter(apvts.getParameter("Pitch_Sel_1"));
-    pitchSel1PA.onParameterChanged = [&] {
-        setCurrentIR(0);
-        updateDecayTime(0);
-    };
-    
-    pitchSel2PA.attachToParameter(apvts.getParameter("Pitch_Sel_2"));
-    pitchSel2PA.onParameterChanged = [&] {
-        setCurrentIR(1);
-        updateDecayTime(1);
-    };
-    
-    pitchSel3PA.attachToParameter(apvts.getParameter("Pitch_Sel_3"));
-    pitchSel3PA.onParameterChanged = [&] {
-        setCurrentIR(2);
-        updateDecayTime(2);
-    };
-    
-    pitchSel4PA.attachToParameter(apvts.getParameter("Pitch_Sel_4"));
-    pitchSel4PA.onParameterChanged = [&] {
-        setCurrentIR(3);
-        updateDecayTime(4);
-    };
-    
-    pitchSel5PA.attachToParameter(apvts.getParameter("Pitch_Sel_5"));
-    pitchSel5PA.onParameterChanged = [&] {
-        setCurrentIR(4);
-        updateDecayTime(4);
-    };
-    
-    chordSelPA.attachToParameter(apvts.getParameter("Chord_Sel"));
-    chordSelPA.onParameterChanged = [&] {
-        startTimer(20);
-    };
-    
-    RootSelPA.attachToParameter(apvts.getParameter("Root_Sel"));
-    RootSelPA.onParameterChanged = [&] {
-        startTimer(20);
-    };
-    
-    ChordHoldPA.attachToParameter(apvts.getParameter("Chord_Hold"));
-    ChordHoldPA.onParameterChanged = [&] {
-        HeldChordValues[0] = pitchsel1->get();
-        HeldChordValues[1] = pitchsel2->get();
-        HeldChordValues[2] = pitchsel3->get();
-        HeldChordValues[3] = pitchsel4->get();
-        HeldChordValues[4] = pitchsel5->get();
-    };
+//    pitchSel1PA.attachToParameter(apvts.getParameter("Pitch_Sel_1"));
+//    pitchSel1PA.onParameterChanged = [&] {
+//        setCurrentIR(0);
+//        updateDecayTime(0);
+//    };
+//    
+//    pitchSel2PA.attachToParameter(apvts.getParameter("Pitch_Sel_2"));
+//    pitchSel2PA.onParameterChanged = [&] {
+//        setCurrentIR(1);
+//        updateDecayTime(1);
+//    };
+//    
+//    pitchSel3PA.attachToParameter(apvts.getParameter("Pitch_Sel_3"));
+//    pitchSel3PA.onParameterChanged = [&] {
+//        setCurrentIR(2);
+//        updateDecayTime(2);
+//    };
+//    
+//    pitchSel4PA.attachToParameter(apvts.getParameter("Pitch_Sel_4"));
+//    pitchSel4PA.onParameterChanged = [&] {
+//        setCurrentIR(3);
+//        updateDecayTime(4);
+//    };
+//    
+//    pitchSel5PA.attachToParameter(apvts.getParameter("Pitch_Sel_5"));
+//    pitchSel5PA.onParameterChanged = [&] {
+//        setCurrentIR(4);
+//        updateDecayTime(4);
+//    };
+//    
+//    chordSelPA.attachToParameter(apvts.getParameter("Chord_Sel"));
+//    chordSelPA.onParameterChanged = [&] {
+//        startTimer(20);
+//    };
+//    
+//    RootSelPA.attachToParameter(apvts.getParameter("Root_Sel"));
+//    RootSelPA.onParameterChanged = [&] {
+//        startTimer(20);
+//    };
+//    
+//    ChordHoldPA.attachToParameter(apvts.getParameter("Chord_Hold"));
+//    ChordHoldPA.onParameterChanged = [&] {
+//        HeldChordValues[0] = pitchsel1->get();
+//        HeldChordValues[1] = pitchsel2->get();
+//        HeldChordValues[2] = pitchsel3->get();
+//        HeldChordValues[3] = pitchsel4->get();
+//        HeldChordValues[4] = pitchsel5->get();
+//    };
     
 }
 
@@ -233,7 +233,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         
         //chords
         juce::StringArray chords = {"Mono","5th","Sus2","Minor","Maj","Sus4","Maj7","min7","7sus"};
-        juce::StringArray roots = {"C","C#","D","D#","E","F","F#","G","G#","A", "A#",       "B","C","C#","D","D#","E","F","F#","G","G#","A", "A#", "B","C"};
+        juce::StringArray roots = {"C","C#","D","D#","E","F","F#","G","G#","A", "A#","B","C","C#","D","D#","E","F","F#","G","G#","A", "A#", "B","C"};
 
 
         layout.add(std::make_unique<AudioParameterChoice>(ParameterID {params.at(Names::Chord_Sel), 1},
@@ -247,9 +247,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout
                                                             0));
         
         
-        layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{params.at(Names::Chord_Hold),1},
-                                                            params.at(Names::Chord_Hold),
-                                                            false));
+//        layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{params.at(Names::Chord_Hold),1},
+//                                                            params.at(Names::Chord_Hold),
+//                                                            false));
         
         //Dry/ wet
         
@@ -261,12 +261,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout
                                                         0.5 ));
         
         //IR select
-        juce::StringArray IRSelectOptions = {"PVC","Glass","Metal","User"};
-        
-        layout.add(std::make_unique<AudioParameterChoice>(ParameterID {params.at(Names::IR_select), 1},
-                                                          params.at(Names::IR_select),
-                                                          IRSelectOptions,
-                                                          0));
+//        juce::StringArray IRSelectOptions = {"PVC","Glass","Metal","User"};
+//
+//        layout.add(std::make_unique<AudioParameterChoice>(ParameterID {params.at(Names::IR_select), 1},
+//                                                          params.at(Names::IR_select),
+//                                                          IRSelectOptions,
+//                                                          0));
         
         
         //Decay
@@ -374,7 +374,7 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     soundtouch.setChannels(1);
     
     dry_wet_mixer.prepare(spec);
-    readIRFromBinary(2, 0);
+    readIRFromFile(2, 0);
     ParallelConvs.prepare(spec);
     
     for(auto& buffer: audioSplitBuffers)
@@ -383,16 +383,16 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     }
     
     setCurrentIRs();
-//    setDecay(pitchsel1->get());
-//    setDecay(pitchsel2->get());
-//    setDecay(pitchsel3->get());
-//    setDecay(pitchsel4->get());
-//    setDecay(pitchsel5->get());
-    updateDecayTime(0);
-    updateDecayTime(1);
-    updateDecayTime(2);
-    updateDecayTime(3);
-    updateDecayTime(4);
+    setDecay(pitchsel1->get());
+    setDecay(pitchsel2->get());
+    setDecay(pitchsel3->get());
+    setDecay(pitchsel4->get());
+    setDecay(pitchsel5->get());
+//    updateDecayTime(0);
+//    updateDecayTime(1);
+//    updateDecayTime(2);
+//    updateDecayTime(3);
+//    updateDecayTime(4);
     
     updateCurrentIRs();
     
@@ -413,11 +413,11 @@ void PipeDreamAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     
 void PipeDreamAudioProcessor::readIRFromFile(int IRNum, int bufferBankID) {
     
-    if (IRNum == 4) {
-        currentIR = UserIRFilePath.getValue().toString();
-    } else {
-        return;
-    }
+    if (IRNum != 4) {
+            currentIR = FilePath + IRNames[IRNum];
+        } else {
+            currentIR = UserIRFilePath.getValue().toString();
+        }
     
     if(currentIR.existsAsFile())
     {
@@ -695,15 +695,15 @@ void PipeDreamAudioProcessor::setCurrentIR(int voiceNumber) {
         pitchsel5
     };
     
-    auto currentBufferSel = apvts.getRawParameterValue("IR_select");
-    int currentBufferArrary = static_cast<int>(currentBufferSel->load());
+    //auto currentBufferSel = apvts.getRawParameterValue("IR_select");
+    //int currentBufferArrary = static_cast<int>(currentBufferSel->load());
         
     auto currentPitch  = pitchIDArray[voiceNumber]->get() + 12;
     
     
     
-        bufferTransfers[voiceNumber].set(BufferWithSampleRate {std::move (BufferStoreArray[currentBufferArrary].BufBankReadP(currentPitch)),
-        BufferStoreArray[currentBufferArrary].GetSampleRate(currentPitch)});
+        bufferTransfers[voiceNumber].set(BufferWithSampleRate {std::move (BufferStoreArray[0].BufBankReadP(currentPitch)),
+        BufferStoreArray[0].GetSampleRate(currentPitch)});
 }
 
 
@@ -711,27 +711,27 @@ void PipeDreamAudioProcessor::setCurrentIR(int voiceNumber) {
 void PipeDreamAudioProcessor::setDecay(int bufferNum) {
     //change buffer store array
     
-    auto currentBufferSel = apvts.getRawParameterValue("IR_select");
-    int currentBufferArrary = static_cast<int>(currentBufferSel->load());
+    //auto currentBufferSel = apvts.getRawParameterValue("IR_select");
+    //int currentBufferArrary = static_cast<int>(currentBufferSel->load());
     
     auto decayTimeValue = DecayTime->get();//.apvts.getRawParameterValue("Decay_Time");
     
-    int decaySample = static_cast<int>(std::round(decayTimeValue* referenceBufferStoreArray[currentBufferArrary].GetSampleRate(bufferNum)));
+    int decaySample = static_cast<int>(std::round(decayTimeValue* referenceBufferStoreArray[0].GetSampleRate(bufferNum)));
 
-      double stretchRatio = referenceBufferStoreArray[currentBufferArrary].getSamples(bufferNum) / static_cast<double>(decaySample);
+      double stretchRatio = referenceBufferStoreArray[0].getSamples(bufferNum) / static_cast<double>(decaySample);
     
     
       juce::AudioBuffer<float> temp;
 
-      int numChannels = referenceBufferStoreArray[currentBufferArrary].getChannels(bufferNum);
+      int numChannels = referenceBufferStoreArray[0].getChannels(bufferNum);
       soundtouch.setTempo(stretchRatio);
 
       temp.setSize(numChannels, decaySample, false, true, false);
 
     
       for (int channel = 0; channel < numChannels; ++channel) {
-        soundtouch.putSamples(referenceBufferStoreArray[currentBufferArrary].BufBankBufferReadP1(bufferNum, channel),
-                              referenceBufferStoreArray[currentBufferArrary].getSamples(bufferNum));
+        soundtouch.putSamples(referenceBufferStoreArray[0].BufBankBufferReadP1(bufferNum, channel),
+                              referenceBufferStoreArray[0].getSamples(bufferNum));
           
         soundtouch.receiveSamples(temp.getWritePointer(channel),
                                   decaySample);
@@ -739,7 +739,7 @@ void PipeDreamAudioProcessor::setDecay(int bufferNum) {
       }
     
     //bufferStore.BufBankBufferWriteP1(bufferNum, channel) //pointer switch
-    BufferStoreArray[currentBufferArrary].makecopy(bufferNum, temp);
+    BufferStoreArray[0].makecopy(bufferNum, temp);
     //setCurrentIR(bufferNum);
 }
 
@@ -925,14 +925,14 @@ juce::AudioProcessorEditor* PipeDreamAudioProcessor::createEditor()
 
 void PipeDreamAudioProcessor::timerCallback() {
 
-    bool chordhold = static_cast<bool>(ChordHold->get());
-   
-
-    if (chordhold) {
-        computeHeldChords();
-    } else {
-        computeChords();
-    }
+//    bool chordhold = ChordHold->get();
+//
+//
+//    if (chordhold) {
+//        computeHeldChords();
+//    } else {
+//        computeChords();
+//    }
     stopTimer();
 }
 

@@ -115,12 +115,12 @@ private:
     juce::Label TitleLabel;
     
 
-    juce::TextButton chordHoldButton {"Hold"};
+    //juce::TextButton chordHoldButton {"Hold"};
     juce::TextButton LoadButton {"Load"};
     
     juce::ComboBox IRSelect;
 
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> ChordHoldAttachment;
+    //std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> ChordHoldAttachment;
     
     //Master Gains
     
